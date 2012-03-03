@@ -19,27 +19,50 @@ import time
 import os
 import sys
 
-CONSUMER_KEY='3PqhYFkJohEruGu1Oxh85g'
-CONSUMER_SECRET='TNmjRcWKMMecAbTJm7WuB8H63xp5GJjvS9y1dWhC0'
-AT_KEY = ''
-AT_SEC = ''
+USERDIR = os.getenv("HOME")
+
+class Yati:
+    def __init__(self):
+        self.config = {
+            'CONSUMER_KEY':'3PqhYFkJohEruGu1Oxh85g',
+            'CONSUMER_SECRET':'TNmjRcWKMMecAbTJm7WuB8H63xp5GJjvS9y1dWhC0',
+            'AT_KEY':'',
+            'AT_SEC':'',
+            'timeZone':'America/New_York'
+        }
+
+        #set the current locale
+        os.environ['TZ'] = self.config['timeZone']
+        time.tzset()
+        
+
+
+        #authorize the user
+        auth = tweepy.OAuthHandler(self.config['CONSUMER_KEY'], self.config['CONSUMER_SECRET']) 
+        try:
+            authfile = open(USERDIR + '/.yti', 'r')
+            authkeys = authfile.readlines();
+            self.config['AT_KEY'] = authkeys[0][:-2]
+            self.config['AT_SEC'] = authkeys[1][:-2]
+        except IOError:
+            sys.stderr.write("NOTICE: Authorization required. Please copy and paste the following URL into your web browser, follow instructions, and then enter the PIN number you receive: " + auth.get_authorization_url() + '\n')
+            verifier = raw_input('PIN: ').strip()
+            auth.get_access_token(verifier)
+            self.config['AT_KEY'] = auth.access_token.key
+            self.config['AT_SEC'] = auth.access_token.secret
+            authkeys = [self.config['AT_KEY'] + '\n', self.config['AT_SEC'] + '\n', 'end']
+            try:
+                authfile = open(USERDIR + '/.yti', 'w')
+                authfile.writelines(authkeys)
+                authfile.close()
+            except IOError:
+                sys.stderr.write("Error writing credentials to file. You may have to re-authorize when you use this app. To prevent this from happening, check disk space and/or file permissions and try again.")
+        auth.set_access_token(self.config['AT_KEY'], self.config['AT_SEC'])
+                
 
 def main():
-    os.environ['TZ'] = 'America/New_York'
-    time.tzset()
-
-    auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-    auth.set_access_token(AT_KEY, AT_SEC)
-    tw = tweepy.API(auth)
-    timeline = tw.home_timeline(count=10)
-    title = "************* RECENT TWEETS ***************"
-    print title.encode('utf8')
-    print 'Last updated: ' + time.strftime('%I:%M%p')
-    print ""
-    for tl in timeline:
-        print tl.user.screen_name + ' (' + tl.user.name + '):'
-        print tl.text.encode('utf8')
-        print '----------------------------'
+    yati = Yati()
+    print 'DONE'
 
 if __name__ == "__main__":
     main()     

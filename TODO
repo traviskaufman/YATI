@@ -2,5 +2,6 @@
 2) Write configuration dictionary. Should at least include:
     1) Number of tweets to retrieve
     2) whether or not to write tweets to file
-    3) [write more things down if/when you think of them...]
+    3) User's TimeZone
+    4) [write more things down if/when you think of them...]
 3) Make it possible to post as well
