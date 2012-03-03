@@ -12,7 +12,7 @@ Fun things you can do with YATI:
 * Configure a crontab to write your tweets to a certain file, then use a program like Geek Tool (OS X) to cat the file and display it on your desktop (not that I do this or anything...)
 """
 __author__ = "Travis Kaufman"
-__version__ = "1.0.0"
+__version__ = "2.0.0-dev"
 
 import tweepy
 import time
@@ -20,6 +20,7 @@ import os
 import sys
 
 USERDIR = os.getenv("HOME")
+DEBUG = 0
 
 class Yati:
     def __init__(self):
@@ -42,8 +43,12 @@ class Yati:
         try:
             authfile = open(USERDIR + '/.yti', 'r')
             authkeys = authfile.readlines();
-            self.config['AT_KEY'] = authkeys[0][:-2]
-            self.config['AT_SEC'] = authkeys[1][:-2]
+            self.config['AT_KEY'] = authkeys[0][:-1]
+            if DEBUG:
+                print 'AT_KEY: ' + self.config['AT_KEY'] + '\n'
+            self.config['AT_SEC'] = authkeys[1][:-1]
+            if DEBUG:
+                print 'AT_SEC: ' + self.config['AT_SEC'] + '\n'
         except IOError:
             sys.stderr.write("NOTICE: Authorization required. Please copy and paste the following URL into your web browser, follow instructions, and then enter the PIN number you receive: " + auth.get_authorization_url() + '\n')
             verifier = raw_input('PIN: ').strip()
@@ -71,9 +76,9 @@ class Yati:
         print title.encode('utf8')
         print 'Last updated: ' + time.strftime('%I:%M%p')
         print ""
-        for tl in timeline:
-            print tl.user.screen_name + ' (' + tl.user.name + '):'
-            print tl.text.encode('utf8')
+        for tweet in tweets:
+            print tweet.user.screen_name + ' (' + tweet.user.name + '):'
+            print tweet.text.encode('utf8')
             print '----------------------------'
 
 def main():
