@@ -10,6 +10,21 @@ Fun things you can do with YATI:
 * Use it in a system call to leverage the data in a program in some way
 * Write your tweets to a file for a nice twitter log (e.g. yati > ~/.tweets)
 * Configure a crontab to write your tweets to a certain file, then use a program like Geek Tool (OS X) to cat the file and display it on your desktop (not that I do this or anything...)
+
+Copyright (C) 2012 Travis Kaufman
+----------------------------------
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see http://www.gnu.org/licenses.
 """
 __author__ = "Travis Kaufman"
 __version__ = "2.0.0-dev"
