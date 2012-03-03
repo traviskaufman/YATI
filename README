@@ -16,6 +16,6 @@ DEPENDENCIES
 
 USAGE
 ==================
-python yati.py
+python yati.py [numberOfTweets]
 
 Enjoy! And please submit questions/issues to me

@@ -81,9 +81,20 @@ class Yati:
             print tweet.text.encode('utf8')
             print '----------------------------'
 
+def printUsage():
+    print 'Usage: python yati.py [numberOfTweets]'
+
 def main():
+    numTweets = 10
+    if len(sys.argv) > 1:
+        try :
+            numTweets = int(sys.argv[1])
+        except ValueError:
+            print 'Error: bad argument ' + sys.argv[1]
+            printUsage()
+            sys.exit()
     yati = Yati()
-    tweets = yati.getTweets()
+    tweets = yati.getTweets(numTweets)
     yati.printTweets(tweets)
 
 if __name__ == "__main__":
