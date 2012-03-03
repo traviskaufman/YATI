@@ -58,11 +58,28 @@ class Yati:
             except IOError:
                 sys.stderr.write("Error writing credentials to file. You may have to re-authorize when you use this app. To prevent this from happening, check disk space and/or file permissions and try again.")
         auth.set_access_token(self.config['AT_KEY'], self.config['AT_SEC'])
-                
+
+        self.tw = tweepy.API(auth);
+    
+    # get a certain number of tweets from the home timeline            
+    def getTweets(self, max=10):
+        return self.tw.home_timeline(count=max)
+
+    # print the tweets
+    def printTweets(self, tweets):
+        title = "************* RECENT TWEETS ***************"
+        print title.encode('utf8')
+        print 'Last updated: ' + time.strftime('%I:%M%p')
+        print ""
+        for tl in timeline:
+            print tl.user.screen_name + ' (' + tl.user.name + '):'
+            print tl.text.encode('utf8')
+            print '----------------------------'
 
 def main():
     yati = Yati()
-    print 'DONE'
+    tweets = yati.getTweets()
+    yati.printTweets(tweets)
 
 if __name__ == "__main__":
     main()     
