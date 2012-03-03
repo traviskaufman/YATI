@@ -1,0 +1,6 @@
+1) Make authentication...idk...POSSIBLE
+2) Write configuration dictionary. Should at least include:
+    1) Number of tweets to retrieve
+    2) whether or not to write tweets to file
+    3) [write more things down if/when you think of them...]
+3) Make it possible to post as well
