@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see http://www.gnu.org/licenses.
 """
 __author__ = "Travis Kaufman"
-__version__ = "2.0.0-dev"
+__version__ = "2.1.x-dev"
 
 import tweepy
 import time
@@ -100,21 +100,51 @@ class Yati:
             print tweet.text.encode('utf8')
             print '----------------------------'
 
+    """
+    Updates your Twitter Status from the command line
+    ---------------------------------------
+    @param status 
+        Your status that you want to post. Supports all UTF-8 characters
+    @return boolean
+        True if status update successful, false if not
+    """
+    def updateStatus(self, newStatus):
+        maxChars = 140
+        if len(newStatus) > maxChars:
+            sys.stderr.write("Error: tweets cannot be more than 140 characters")
+            return False
+        status = self.tw.update_status(unicode(newStatus))
+        if status:
+            print status
+            return True
+        else:
+            return False
+
+
 def printUsage():
-    print 'Usage: python yati.py [numberOfTweets]'
+    print 'Usage: python yati.py [numberOfTweets] OR python yati.py --update [status]'
 
 def main():
     numTweets = 10
+    isStatusUpdate = False
     if len(sys.argv) > 1:
-        try :
-            numTweets = int(sys.argv[1])
-        except ValueError:
-            print 'Error: bad argument ' + sys.argv[1]
-            printUsage()
-            sys.exit()
+        # check integrity of sys.argv[2]
+        if sys.argv[1] == "--update" and sys.argv[2] != None:
+            isStatusUpdate = True
+        else:
+            try :
+                numTweets = int(sys.argv[1])
+            except ValueError:
+                print 'Error: bad argument ' + sys.argv[1]
+                printUsage()
+                sys.exit()
+
     yati = Yati()
-    tweets = yati.getTweets(numTweets)
-    yati.printTweets(tweets)
+    if isStatusUpdate:
+        yati.updateStatus(sys.argv[2])
+    else:
+        tweets = yati.getTweets(numTweets)
+        yati.printTweets(tweets)
 
 if __name__ == "__main__":
     main()     

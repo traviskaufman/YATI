@@ -8,6 +8,8 @@ Fun things you can do with YATI:
 * Use it in a system call to leverage the data in a program in some way
 * Write your tweets to a file for a nice twitter log (e.g. yati > ~/.tweets)
 * Configure a crontab to write your tweets to a certain file, then use a program like Geek Tool (OS X) to cat the file and display it on your desktop (not that I do this or anything...)
+* NEW! Update your tweets from the command line! More features to be added on this soon
+
 
 DEPENDENCIES
 ===================
