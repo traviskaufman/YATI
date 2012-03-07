@@ -1,4 +1,4 @@
-1) Make authentication...idk...POSSIBLE
+1) Write logic to store tweets in a list, so users can recall them and delete them 
 2) Write configuration dictionary. Should at least include:
     0) WRITE BETTER COMMENTS
     1) Number of tweets to retrieve
