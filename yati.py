@@ -65,7 +65,10 @@ class Yati:
             if DEBUG:
                 print 'AT_SEC: ' + self.config['AT_SEC'] + '\n'
         except IOError:
-            sys.stderr.write("NOTICE: Authorization required. Please copy and paste the following URL into your web browser, follow instructions, and then enter the PIN number you receive: " + auth.get_authorization_url() + '\n')
+            aURL = auth.get_authorization_url()
+            sys.stderr.write("***NOTICE: Authorization required.***\nA URL will soon open that will guide you through app authorization. Once you have authorized the app, enter the PIN you receive below.\nIf it doesn't open, please paste the following into your web browser: " + aURL + '\n')
+            time.sleep(3)
+            os.system('open ' + aURL)
             verifier = raw_input('PIN: ').strip()
             auth.get_access_token(verifier)
             self.config['AT_KEY'] = auth.access_token.key
@@ -75,6 +78,7 @@ class Yati:
                 authfile = open(USERDIR + '/.yti', 'w')
                 authfile.writelines(authkeys)
                 authfile.close()
+                sys.stderr.write("Successfully authorized!\n")
             except IOError:
                 sys.stderr.write("Error writing credentials to file. You may have to re-authorize when you use this app. To prevent this from happening, check disk space and/or file permissions and try again.")
         auth.set_access_token(self.config['AT_KEY'], self.config['AT_SEC'])
