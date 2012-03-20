@@ -18,6 +18,8 @@ DEPENDENCIES
 
 USAGE
 ==================
-python yati.py [numberOfTweets]
+python yati.py [numberOfTweets] 
+OR
+python yati.py --update ["your status"]
 
 Enjoy! And please submit questions/issues to me
