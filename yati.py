@@ -85,7 +85,13 @@ class Yati:
         auth.set_access_token(self.config['AT_KEY'], self.config['AT_SEC'])
 
         self.tw = tweepy.API(auth);
-        self.tweetTable = {};    
+        self.tweetTable = {}; 
+        # Try and get past tweets
+        # TODO: Refactor file paths into global variables
+        try:
+            self.tweetTable = pickle.load(open(USERDIR + '.__yt_tweets', 'r'))
+        except IOError:
+            pass
     # get a certain number of tweets from the home timeline            
     def getTweets(self, max=10):
         return self.tw.home_timeline(count=max)
@@ -143,7 +149,11 @@ class Yati:
         self.tweetTable[len(self.tweetTable)] = tweet
 
     # Serialize tweetTable and write it to file
-    
+    def __del__(self):
+        try:
+          tweetFile = open(USERDIR + '/.__yt__tweets', 'w')
+          pickle.dump(self.tweetTable, tweetFile)
+
 def printUsage():
     print 'Usage: python yati.py [numberOfTweets] OR python yati.py --update [status]'
 
