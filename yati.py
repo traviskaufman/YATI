@@ -33,6 +33,7 @@ import tweepy
 import time
 import os
 import sys
+import pickle
 
 USERDIR = os.getenv("HOME")
 DEBUG = 0
@@ -84,19 +85,21 @@ class Yati:
         auth.set_access_token(self.config['AT_KEY'], self.config['AT_SEC'])
 
         self.tw = tweepy.API(auth);
-    
+        self.tweetTable = {};    
     # get a certain number of tweets from the home timeline            
     def getTweets(self, max=10):
         return self.tw.home_timeline(count=max)
 
     # print the tweets
     def printTweets(self, tweets):
+        i = 0
         title = "************* RECENT TWEETS ***************"
         print title.encode('utf8')
         print 'Last updated: ' + time.strftime('%I:%M%p')
         print ""
         for tweet in tweets:
-            print tweet.user.screen_name + ' (' + tweet.user.name + '):'
+            i += 1
+            print "#" + str(i) + ": " + tweet.user.screen_name + ' (' + tweet.user.name + '):'
             print tweet.text.encode('utf8')
             print '----------------------------'
 
@@ -119,8 +122,28 @@ class Yati:
             return True
         else:
             return False
+    
+    """
+    Stores a list of teepy status objects into a hash table so they can be used
+    in the future
+    ---------------------------------------------------
+    @param *tweets
+        The list of twitter status objects to store
+    """
+    def storeTweets(self, *tweets):
+        [self.storeTweet(tw) for tw in tweets] 
 
+    """
+    Stores an individual tweet. Helpler method for storeTweets()
+    --------------------------------
+    @param tweet
+        The tweet to store
+    """
+    def storeTweet(self, tweet):
+        self.tweetTable[len(self.tweetTable)] = tweet
 
+    # Serialize tweetTable and write it to file
+    
 def printUsage():
     print 'Usage: python yati.py [numberOfTweets] OR python yati.py --update [status]'
 
@@ -145,6 +168,7 @@ def main():
     else:
         tweets = yati.getTweets(numTweets)
         yati.printTweets(tweets)
+        yati.storeTweets(*tweets)
 
 if __name__ == "__main__":
     main()     
