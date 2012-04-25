@@ -1,11 +1,5 @@
 #!/usr/bin/python
 """
-TODO:
----------------------------------
-1) Erase the current tweetable every time new tweets are written
-2) Update This Description and README
-"""
-"""
 YATI (Yet Another Twitter Interface) - A TWITTER CLI FOR GEEKS
 ****************************
 Starting as a bored-one-night hack, this gem scrapes your twitter feed for the 10 most recent posts, and displays them for you at the command line. More features to be added in the future. 
@@ -204,7 +198,7 @@ class Yati:
             if not self.canReTweet:
                 return None
             else:
-                theTweet = self.tweetTable[tweetID]
+                theTweet = self.tweetTable[tweetID-1]
                 self.tw.retweet(theTweet.id)
                 return theTweet
         except KeyError:
