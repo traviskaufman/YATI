@@ -10,12 +10,12 @@ YATI (Yet Another Twitter Interface) - A TWITTER CLI FOR GEEKS
 ****************************
 Starting as a bored-one-night hack, this gem scrapes your twitter feed for the 10 most recent posts, and displays them for you at the command line. More features to be added in the future. 
 
-Fun things you can do with YATI:
+HOW TO USE:
 ---------------------------------
-* Read your recent twitter feed without ever leaving the comfort of the command line. 
-* Use it in a system call to leverage the data in a program in some way
-* Write your tweets to a file for a nice twitter log (e.g. yati > ~/.tweets)
-* Configure a crontab to write your tweets to a certain file, then use a program like Geek Tool (OS X) to cat the file and display it on your desktop (not that I do this or anything...)
+* To get the 10 newest tweets on your home timeline: $ python yati.py 
+* To get the X newest tweets on your home timeline: $ python yati.py X
+* To update your status: $ python yati.py --update [your status update, surrounded by quotes]
+* To retweet a status (NEW!!): $ python yati.py --rt [tweet_#] **Note: The tweet # will appear as the #N right before the tweet when you make a call to Yati. e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2 
 
 Copyright (C) 2012 Travis Kaufman
 ----------------------------------
@@ -42,7 +42,7 @@ import sys
 import pickle
 
 USERDIR = os.getenv("HOME")
-DEBUG = 1
+DEBUG = 0
 
 class Yati:
     def __init__(self):
@@ -220,7 +220,7 @@ class Yati:
             print 'File write failed'
 
 def printUsage():
-    print 'Usage: python yati.py [numberOfTweets] [--update status]'
+    print 'Usage: python yati.py [numberOfTweets] [--update status] [--rt tweet_#]'
 
 def main():
     numTweets = 10

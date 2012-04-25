@@ -1,25 +1,25 @@
 YATI (Yet Another Twitter Interface) - A TWITTER CLI FOR GEEKS
 ****************************
-A bored-one-night hack, this gem scrapes your twitter feed for the 10 most recent posts, and displays them for you at the command line. More features to be added in the future. 
+Starting as a bored-one-night hack, this gem scrapes your twitter feed for the 10 most recent posts, and displays them for you at the command line. More features to be added in the future. 
 
-Fun things you can do with YATI:
+HOW TO USE:
 ---------------------------------
-* Read your recent twitter feed without ever leaving the comfort of the command line. 
-* Use it in a system call to leverage the data in a program in some way
-* Write your tweets to a file for a nice twitter log (e.g. yati > ~/.tweets)
-* Configure a crontab to write your tweets to a certain file, then use a program like Geek Tool (OS X) to cat the file and display it on your desktop (not that I do this or anything...)
-* NEW! Update your tweets from the command line! More features to be added on this soon
+* To get the 10 newest tweets on your home timeline: $ python yati.py 
+* To get the X newest tweets on your home timeline: $ python yati.py X
+* To update your status: $ python yati.py --update [your status update, surrounded by quotes]
+* To retweet a status (NEW!!): $ python yati.py --rt [tweet_#] **Note: The tweet # will appear as the #N right before the tweet when you make a call to Yati. e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2 
 
+Copyright (C) 2012 Travis Kaufman
+----------------------------------
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-DEPENDENCIES
-===================
-1) Python 2.7+
-2) The unbelievably amazing Tweepy library (http://pypi.python.org/pypi/tweepy/1.6 || http://github.com/joshthecoder/tweepy)
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-USAGE
-==================
-python yati.py [numberOfTweets] 
-OR
-python yati.py --update ["your status"]
-
-Enjoy! And please submit questions/issues to me
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see http://www.gnu.org/licenses.
