@@ -1,9 +1,4 @@
-1) Write logic to store tweets in a list, so users can recall them and delete them 
-2) Write configuration dictionary. Should at least include:
-    0) WRITE BETTER COMMENTS
-    1) Number of tweets to retrieve
-    2) whether or not to write tweets to file
-    3) User's TimeZone
-    4) [write more things down if/when you think of them...]
-3) Make it possible to post as well
-4) LONG TERM: Make more secure
+1) Make authentication storage WAY more secure
+2) Go back and comment everything the right way
+3) Put all member variables in one place
+
