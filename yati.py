@@ -95,11 +95,14 @@ class Yati:
         self.tweetTable = {}; 
         # TODO: Refactor file paths into global variables
         # Load the latest tweets gotten by the program into tweetTable
+        self.canReTweet = True
         try:
             self.tweetTable = pickle.load(open(USERDIR + '/.__yt__tweets', 'r'))
-            if not dict:
-              print 'Dictionary is empty'
+            if not self.tweetTable:
+              print 'No stored tweets; cannot retweet. Try running "python yati.py" and try again' 
+              self.canReTweet = False
         except IOError:
+            print 'Failed to retrieve stored tweets. Make sure you have tweets stored and/or you have file permissions set correctly.'
             self.canReTweet = False;
 
     # get a certain number of tweets from the home timeline            
@@ -182,9 +185,12 @@ class Yati:
     """
     def retweet(self, tweetID):
         try:
-            theTweet = self.tweetTable[tweetID]
-            self.tw.retweet(theTweet.id)
-            return theTweet
+            if not self.canReTweet:
+                return None
+            else:
+                theTweet = self.tweetTable[tweetID]
+                self.tw.retweet(theTweet.id)
+                return theTweet
         except KeyError:
             return -1
 
@@ -239,8 +245,10 @@ def main():
               print str(tweetID) + ' is not a valid key. Please enter a valid key and try again'
               printUsage()
               sys.exit()
+          elif not result:
+              print 'Retweet failed'
           else: # was successful
-              print 'Retweet of tweet #' + str(tweetID) + ' (' + result.text[:20].encode('utf8') + ') successful!'
+              print 'Retweet of tweet #' + str(tweetID) + ' (' + result.text[:50].encode('utf8') + '...) by @' + result.user.screen_name + ' successful!'
 
     else:
         tweets = yati.getTweets(numTweets)
