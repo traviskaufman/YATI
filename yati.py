@@ -1,5 +1,10 @@
 #!/usr/bin/python
-#TODO: Update This Description and README
+"""
+TODO:
+---------------------------------
+1) Erase the current tweetable every time new tweets are written
+2) Update This Description and README
+"""
 """
 YATI (Yet Another Twitter Interface) - A TWITTER CLI FOR GEEKS
 ****************************
@@ -91,13 +96,17 @@ class Yati:
         # TODO: Refactor file paths into global variables
         # Load the latest tweets gotten by the program into tweetTable
         try:
-            self.tweetTable = pickle.load(open(USERDIR + '.__yt_tweets', 'r'))
+            self.tweetTable = pickle.load(open(USERDIR + '/.__yt__tweets', 'r'))
+            if not dict:
+              print 'Dictionary is empty'
         except IOError:
             self.canReTweet = False;
 
     # get a certain number of tweets from the home timeline            
     def getTweets(self, max=10):
-        return self.tw.home_timeline(count=max)
+        theTweets = self.tw.home_timeline(count=max)
+        self.storeTweets(theTweets)
+        return theTweets
 
     # print the tweets
     def printTweets(self, tweets):
@@ -216,10 +225,23 @@ def main():
                 sys.exit()
 
     yati = Yati()
+    if DEBUG:
+        print yati.tweetTable
     if isStatusUpdate:
         yati.updateStatus(sys.argv[2])
     elif isRetweet:
-          yati.retweet(tweetID)
+          result = yati.retweet(tweetID)
+          if result is 0:
+              print 'Error: unknown failure. Check internet connection possibly'
+              printUsage()
+              sys.exit()
+          elif result is -1:
+              print str(tweetID) + ' is not a valid key. Please enter a valid key and try again'
+              printUsage()
+              sys.exit()
+          else: # was successful
+              print 'Retweet of tweet #' + str(tweetID) + ' (' + result.text[:20].encode('utf8') + ') successful!'
+
     else:
         tweets = yati.getTweets(numTweets)
         yati.printTweets(tweets)
