@@ -42,7 +42,7 @@ import sys
 import pickle
 
 USERDIR = os.getenv("HOME")
-DEBUG = 0
+DEBUG = 1
 
 class Yati:
     def __init__(self):
@@ -55,6 +55,7 @@ class Yati:
         }
         
         self.shouldFlushPrevTweets = True
+        self.gotTweetsBefore = False # set true on first call to getTweets()
 
         #set the current locale
         os.environ['TZ'] = self.config['timeZone']
@@ -94,6 +95,7 @@ class Yati:
         self.tw = tweepy.API(auth);
         # them, work with them, etc.
         self.tweetTable = {};
+        self.tweetTableLength = 0;
         # only overwrite previous tweets if tweets have been retrieved
         # TODO: Refactor file paths into global variables
         # Load the latest tweets gotten by the program into tweetTable
@@ -101,8 +103,10 @@ class Yati:
         try:
             self.tweetTable = pickle.load(open(USERDIR + '/.__yt__tweets', 'r'))
             if not self.tweetTable:
-              print 'No stored tweets; cannot retweet. Try running "python yati.py" and try again' 
-              self.canReTweet = False
+                print 'No stored tweets; cannot retweet. Try running "python yati.py" and try again' 
+                self.canReTweet = False
+            else:
+                self.tweetTableLength = len(self.tweetTable)
         except IOError:
             print 'Failed to retrieve stored tweets. Make sure you have tweets stored and/or you have file permissions set correctly.'
             self.canReTweet = False;
@@ -111,6 +115,7 @@ class Yati:
     def getTweets(self, max=10):
         theTweets = self.tw.home_timeline(count=max)
         self.storeTweets(theTweets)
+        self.gotTweetsBefore = True
         return theTweets
 
     # print the tweets
@@ -156,16 +161,23 @@ class Yati:
         The list of twitter status objects to store
     """
     def storeTweets(self, *tweets):
-        [self.storeTweet(tw) for tw in tweets] 
-
+        if (DEBUG):
+            print 'Tweets '
+            print tweets
+        if self.shouldFlushPrevTweets and not self.gotTweetsBefore:
+            self.tweetTable = {}
+            self.tweetTableLength = 0
+        [self.storeTweet(tw) for tw in tweets[0]]
     """
     Stores an individual tweet. Helpler method for storeTweets()
     --------------------------------
     @param tweet
         The tweet to store
     """
+    #TODO: Store tweetTableLength as a member var so that this can be O(1) time instead of O(n) time
     def storeTweet(self, tweet):
-        self.tweetTable[len(self.tweetTable)] = tweet
+        self.tweetTable[self.tweetTableLength] = tweet
+        self.tweetTableLength = self.tweetTableLength + 1
     
     """
     Retweets a tweet based on its ID
@@ -258,7 +270,7 @@ def main():
     else:
         tweets = yati.getTweets(numTweets)
         yati.printTweets(tweets)
-        yati.storeTweets(*tweets)
+
 
 if __name__ == "__main__":
     main()     
