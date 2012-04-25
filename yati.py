@@ -153,6 +153,8 @@ class Yati:
         try:
           tweetFile = open(USERDIR + '/.__yt__tweets', 'w')
           pickle.dump(self.tweetTable, tweetFile)
+        except IOError:
+          print 'File write failed'
 
 def printUsage():
     print 'Usage: python yati.py [numberOfTweets] OR python yati.py --update [status]'
