@@ -53,6 +53,8 @@ class Yati:
             'AT_SEC':'',
             'timeZone':'America/New_York'
         }
+        
+        self.shouldFlushPrevTweets = True
 
         #set the current locale
         os.environ['TZ'] = self.config['timeZone']
@@ -90,9 +92,9 @@ class Yati:
         
         # get the Tweepy API
         self.tw = tweepy.API(auth);
-        # Dictionary to hold the latest gotten tweets, in order to retweet
         # them, work with them, etc.
-        self.tweetTable = {}; 
+        self.tweetTable = {};
+        # only overwrite previous tweets if tweets have been retrieved
         # TODO: Refactor file paths into global variables
         # Load the latest tweets gotten by the program into tweetTable
         self.canReTweet = True
@@ -133,6 +135,8 @@ class Yati:
         True if status update successful, false if not
     """
     def updateStatus(self, newStatus):
+        # We aren't getting any new tweets so no reason to flush the tweetTable
+        self.shouldFlushPrevTweets = False
         maxChars = 140
         if len(newStatus) > maxChars:
             sys.stderr.write("Error: tweets cannot be more than 140 characters")
@@ -196,11 +200,12 @@ class Yati:
 
     # Serialize tweetTable and write it to file
     def __del__(self):
-        try:
-          tweetFile = open(USERDIR + '/.__yt__tweets', 'w')
-          pickle.dump(self.tweetTable, tweetFile)
-        except IOError:
-          print 'File write failed'
+      if self.shouldFlushPrevTweets:
+          try:
+            tweetFile = open(USERDIR + '/.__yt__tweets', 'w')
+            pickle.dump(self.tweetTable, tweetFile)
+          except IOError:
+            print 'File write failed'
 
 def printUsage():
     print 'Usage: python yati.py [numberOfTweets] [--update status]'
