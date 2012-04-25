@@ -1,8 +1,9 @@
 #!/usr/bin/python
+#TODO: Update This Description and README
 """
 YATI (Yet Another Twitter Interface) - A TWITTER CLI FOR GEEKS
 ****************************
-A bored-one-night hack, this gem scrapes your twitter feed for the 10 most recent posts, and displays them for you at the command line. More features to be added in the future. 
+Starting as a bored-one-night hack, this gem scrapes your twitter feed for the 10 most recent posts, and displays them for you at the command line. More features to be added in the future. 
 
 Fun things you can do with YATI:
 ---------------------------------
@@ -51,8 +52,6 @@ class Yati:
         #set the current locale
         os.environ['TZ'] = self.config['timeZone']
         time.tzset()
-        
-
 
         #authorize the user
         auth = tweepy.OAuthHandler(self.config['CONSUMER_KEY'], self.config['CONSUMER_SECRET']) 
@@ -83,15 +82,19 @@ class Yati:
             except IOError:
                 sys.stderr.write("Error writing credentials to file. You may have to re-authorize when you use this app. To prevent this from happening, check disk space and/or file permissions and try again.")
         auth.set_access_token(self.config['AT_KEY'], self.config['AT_SEC'])
-
+        
+        # get the Tweepy API
         self.tw = tweepy.API(auth);
+        # Dictionary to hold the latest gotten tweets, in order to retweet
+        # them, work with them, etc.
         self.tweetTable = {}; 
-        # Try and get past tweets
         # TODO: Refactor file paths into global variables
+        # Load the latest tweets gotten by the program into tweetTable
         try:
             self.tweetTable = pickle.load(open(USERDIR + '.__yt_tweets', 'r'))
         except IOError:
-            pass
+            self.canReTweet = False;
+
     # get a certain number of tweets from the home timeline            
     def getTweets(self, max=10):
         return self.tw.home_timeline(count=max)
@@ -147,6 +150,34 @@ class Yati:
     """
     def storeTweet(self, tweet):
         self.tweetTable[len(self.tweetTable)] = tweet
+    
+    """
+    Retweets a tweet based on its ID
+    --------------------------------
+    @param tweetID
+        The tweetTable key that corresponds to the tweet you'd like to retweet.
+        Users will be able to identify this by the "#X" before each tweet,
+        where X is the integer value that corresponds to the dictionaries key.
+        I know what you may be thinking, why don't I just use an array? The
+        answer is because: 1) Since dictionaries are essentially ordered maps
+        the functionality is more extendable 2) The overhead cost compared to
+        arrays are very minimal 3) Pickle loads up its stored objects into a
+        dictionary, so I'll stick with the way Pickle does it
+
+    @return tweepy.status object | integer
+        If sucessful, this will return the status object that was retweeted. If
+        unsuccessful, it will return some sort of error code that will give an
+        indication as to why the retweet failed. Error codes thus far are:
+        0: The tweepy call failed
+        -1: User input an integer key that did not exist
+    """
+    def retweet(self, tweetID):
+        try:
+            theTweet = self.tweetTable[tweetID]
+            self.tw.retweet(theTweet.id)
+            return theTweet
+        except KeyError:
+            return -1
 
     # Serialize tweetTable and write it to file
     def __del__(self):
@@ -157,15 +188,25 @@ class Yati:
           print 'File write failed'
 
 def printUsage():
-    print 'Usage: python yati.py [numberOfTweets] OR python yati.py --update [status]'
+    print 'Usage: python yati.py [numberOfTweets] [--update status]'
 
 def main():
     numTweets = 10
+    tweetID = None
     isStatusUpdate = False
+    isRetweet = False
     if len(sys.argv) > 1:
         # check integrity of sys.argv[2]
         if sys.argv[1] == "--update" and sys.argv[2] != None:
             isStatusUpdate = True
+        elif sys.argv[1] == "--rt" and sys.argv[2] != None:
+            try:
+                tweetID = int(sys.argv[2])
+                isRetweet = True
+            except ValueError:
+                print 'Error: bad argument ' + sys.argv[1] + '. Retweet ID must be an integer'
+                printUsage()
+                sys.exit()
         else:
             try :
                 numTweets = int(sys.argv[1])
@@ -177,6 +218,8 @@ def main():
     yati = Yati()
     if isStatusUpdate:
         yati.updateStatus(sys.argv[2])
+    elif isRetweet:
+          yati.retweet(tweetID)
     else:
         tweets = yati.getTweets(numTweets)
         yati.printTweets(tweets)
