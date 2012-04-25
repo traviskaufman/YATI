@@ -1,6 +1,10 @@
 YATI (Yet Another Twitter Interface) - A TWITTER CLI FOR GEEKS
 ****************************
-Starting as a bored-one-night hack, this gem scrapes your twitter feed for the 10 most recent posts, and displays them for you at the command line. More features to be added in the future. 
+Starting as a bored-one-night hack home feed scraper, YATI is now (turning into?) a full-blown twitter CLI, with the ability to retrieve any number of tweets from your home timeline, post status updates, and retweet statuses.
+More features, such as being able to retrieve tweets from specific friends, get mentions, etc. will be added in the future!
+
+
+This program is made possible by the awesome Tweepy library (https://github.com/tweepy/tweepy) which, if you need to interface with Twitter via Python, I HIGHLY recommend you make use of.
 
 HOW TO USE:
 ---------------------------------
