@@ -97,7 +97,6 @@ class Yati:
         try:
             self.tweetTable = pickle.load(open(USERDIR + '/.__yt__tweets', 'r'))
             if not self.tweetTable:
-                print 'No stored tweets; cannot retweet. Try running "python yati.py" and try again' 
                 self.canReTweet = False
             else:
                 self.tweetTableLength = len(self.tweetTable)
@@ -257,7 +256,7 @@ def main():
               printUsage()
               sys.exit()
           elif not result:
-              print 'Retweet failed'
+              print 'Retweet failed. Perhaps you have not stored any tweets? Try running just yati.py or yati.py [numTweets] and try again'
           else: # was successful
               print 'Retweet of tweet #' + str(tweetID) + ' (' + result.text[:50].encode('utf8') + '...) by @' + result.user.screen_name + ' successful!'
 
