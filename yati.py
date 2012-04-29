@@ -34,6 +34,7 @@ import time
 import os
 import sys
 import pickle
+import HTMLParser
 
 USERDIR = os.getenv("HOME")
 DEBUG = 0
@@ -50,7 +51,6 @@ class Yati:
         
         self.shouldFlushPrevTweets = True
         self.gotTweetsBefore = False # set true on first call to getTweets()
-
         #set the current locale
         os.environ['TZ'] = self.config['timeZone']
         time.tzset()
@@ -113,6 +113,7 @@ class Yati:
 
     # print the tweets
     def printTweets(self, tweets):
+        h = HTMLParser.HTMLParser()
         i = 0
         title = "************* RECENT TWEETS ***************"
         print title.encode('utf8')
@@ -121,7 +122,7 @@ class Yati:
         for tweet in tweets:
             i += 1
             print "#" + str(i) + ": " + tweet.user.screen_name + ' (' + tweet.user.name + '):'
-            print tweet.text.encode('utf8')
+            print h.unescape(tweet.text.encode('utf8'))
             print '----------------------------'
 
     """
