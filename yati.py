@@ -41,6 +41,7 @@ DEBUG = 0
 
 class Yati:
     def __init__(self):
+        # TODO: Move USERDIR into config b/c having it as a global is unnecessary b/c it's used only within the class
         self.config = {
             'CONSUMER_KEY':'3PqhYFkJohEruGu1Oxh85g',
             'CONSUMER_SECRET':'TNmjRcWKMMecAbTJm7WuB8H63xp5GJjvS9y1dWhC0',
