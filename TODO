@@ -1,4 +1,8 @@
-1) Make authentication storage WAY more secure
-2) Go back and comment everything the right way
-3) Put all member variables in one place
-
+Better message for status update
+ArgParser
+Easy_Install
+Move USERDIR global into config
+Make authentication storage WAY more secure
+Go back and comment everything the right way
+Put all member variables in one place
+UNIT TESTS

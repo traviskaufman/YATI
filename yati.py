@@ -2,14 +2,16 @@
 """
 YATI (Yet Another Twitter Interface) - A TWITTER CLI FOR GEEKS
 ****************************
-Starting as a bored-one-night hack, this gem scrapes your twitter feed for the 10 most recent posts, and displays them for you at the command line. More features to be added in the future. 
 
 HOW TO USE:
 ---------------------------------
-* To get the 10 newest tweets on your home timeline: $ python yati.py 
+* To get the 10 newest tweets on your home timeline: $ python yati.py
 * To get the X newest tweets on your home timeline: $ python yati.py X
-* To update your status: $ python yati.py --update [your status update, surrounded by quotes]
-* To retweet a status (NEW!!): $ python yati.py --rt [tweet_#] **Note: The tweet # will appear as the #N right before the tweet when you make a call to Yati. e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2 
+* To update your status: $ python yati.py --update [your_status_update]
+* To retweet a status (NEW!!): $ python yati.py --rt [tweet_#]
+        **Note: The tweet # will appear as the #N right before the tweet when
+        you make a call to Yati.
+        e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2
 
 Copyright (C) 2012 Travis Kaufman
 ----------------------------------
@@ -39,28 +41,29 @@ import HTMLParser
 USERDIR = os.getenv("HOME")
 DEBUG = 0
 
+
 class Yati:
     def __init__(self):
-        # TODO: Move USERDIR into config b/c having it as a global is unnecessary b/c it's used only within the class
         self.config = {
-            'CONSUMER_KEY':'3PqhYFkJohEruGu1Oxh85g',
-            'CONSUMER_SECRET':'TNmjRcWKMMecAbTJm7WuB8H63xp5GJjvS9y1dWhC0',
-            'AT_KEY':'',
-            'AT_SEC':'',
-            'timeZone':'America/New_York'
+            'CONSUMER_KEY': '3PqhYFkJohEruGu1Oxh85g',
+            'CONSUMER_SECRET': 'TNmjRcWKMMecAbTJm7WuB8H63xp5GJjvS9y1dWhC0',
+            'AT_KEY': '',
+            'AT_SEC': '',
+            'timeZone': 'America/New_York'
         }
-        
+
         self.shouldFlushPrevTweets = True
-        self.gotTweetsBefore = False # set true on first call to getTweets()
+        self.gotTweetsBefore = False  # set true on first call to getTweets()
         #set the current locale
         os.environ['TZ'] = self.config['timeZone']
         time.tzset()
 
         #authorize the user
-        auth = tweepy.OAuthHandler(self.config['CONSUMER_KEY'], self.config['CONSUMER_SECRET']) 
+        auth = tweepy.OAuthHandler(self.config['CONSUMER_KEY'],
+                                   self.config['CONSUMER_SECRET'])
         try:
             authfile = open(USERDIR + '/.yti', 'r')
-            authkeys = authfile.readlines();
+            authkeys = authfile.readlines()
             self.config['AT_KEY'] = authkeys[0][:-1]
             if DEBUG:
                 print 'AT_KEY: ' + self.config['AT_KEY'] + '\n'
@@ -68,44 +71,55 @@ class Yati:
             if DEBUG:
                 print 'AT_SEC: ' + self.config['AT_SEC'] + '\n'
         except IOError:
-            aURL = auth.get_authorization_url()
-            sys.stderr.write("***NOTICE: Authorization required.***\nA URL will soon open that will guide you through app authorization. Once you have authorized the app, enter the PIN you receive below.\nIf it doesn't open, please paste the following into your web browser: " + aURL + '\n')
+            auth_url = auth.get_authorization_url()
+            sys.stderr.write(
+                "***NOTICE: Authorization required.***\nA URL will soon open "\
+                "that will guide you through app authorization. Once you have"\
+                " authorized the app, enter the PIN you receive below.\nIf it"\
+                " doesn't open, please paste the following into your web "\
+                " browser: %s\n" % auth_url)
             time.sleep(3)
-            os.system('open ' + aURL)
+            os.system('open ' + auth_url)
             verifier = raw_input('PIN: ').strip()
             auth.get_access_token(verifier)
             self.config['AT_KEY'] = auth.access_token.key
             self.config['AT_SEC'] = auth.access_token.secret
-            authkeys = [self.config['AT_KEY'] + '\n', self.config['AT_SEC'] + '\n', 'end']
+            authkeys = ["%s\n" % self.config['AT_KEY'],
+                        "%s\n" % self.config['AT_SEC'],
+                        'end']
             try:
                 authfile = open(USERDIR + '/.yti', 'w')
                 authfile.writelines(authkeys)
                 authfile.close()
                 sys.stderr.write("Successfully authorized!\n")
             except IOError:
-                sys.stderr.write("Error writing credentials to file. You may have to re-authorize when you use this app. To prevent this from happening, check disk space and/or file permissions and try again.")
+                sys.stderr.write("Error writing credentials to file. "\
+                    "You may have to re-authorize when you use this app. "\
+                    "To prevent this from happening, check disk space and/or "\
+                    "file permissions and try again.")
         auth.set_access_token(self.config['AT_KEY'], self.config['AT_SEC'])
-        
+
         # get the Tweepy API
-        self.tw = tweepy.API(auth);
+        self.tw = tweepy.API(auth)
         # them, work with them, etc.
-        self.tweetTable = {};
-        self.tweetTableLength = 0;
-        # only overwrite previous tweets if tweets have been retrieved
-        # TODO: Refactor file paths into global variables
+        self.tweetTable = {}
+        self.tweetTableLength = 0
         # Load the latest tweets gotten by the program into tweetTable
         self.canReTweet = True
         try:
-            self.tweetTable = pickle.load(open(USERDIR + '/.__yt__tweets', 'r'))
+            self.tweetTable = pickle.load(open('%s/.__yt__tweets' % USERDIR,
+                                          'r'))
             if not self.tweetTable:
                 self.canReTweet = False
             else:
                 self.tweetTableLength = len(self.tweetTable)
         except IOError:
-            print 'Failed to retrieve stored tweets. Make sure you have tweets stored and/or you have file permissions set correctly.'
-            self.canReTweet = False;
+            print 'Failed to retrieve stored tweets. Make sure you have '\
+                  'tweets stored and/or you have file permissions set '\
+                  'correctly.'
+            self.canReTweet = False
 
-    # get a certain number of tweets from the home timeline            
+    # get a certain number of tweets from the home timeline
     def getTweets(self, max=10):
         theTweets = self.tw.home_timeline(count=max)
         self.storeTweets(theTweets)
@@ -122,14 +136,16 @@ class Yati:
         print ""
         for tweet in tweets:
             i += 1
-            print "#" + str(i) + ": " + tweet.user.screen_name + ' (' + tweet.user.name + '):'
+            print "#%s: %s (%s)" % (str(i),
+                                    tweet.user.screen_name,
+                                    tweet.user.name)
             print h.unescape(tweet.text.encode('utf8'))
             print '----------------------------'
 
     """
     Updates your Twitter Status from the command line
     ---------------------------------------
-    @param status 
+    @param status
         Your status that you want to post. Supports all UTF-8 characters
     @return boolean
         True if status update successful, false if not
@@ -139,7 +155,8 @@ class Yati:
         self.shouldFlushPrevTweets = False
         maxChars = 140
         if len(newStatus) > maxChars:
-            sys.stderr.write("Error: tweets cannot be more than 140 characters")
+            sys.stderr.write(
+                    "Error: tweets cannot be more than 140 characters")
             return False
         status = self.tw.update_status(unicode(newStatus))
         if status:
@@ -147,7 +164,7 @@ class Yati:
             return True
         else:
             return False
-    
+
     """
     Stores a list of teepy status objects into a hash table so they can be used
     in the future
@@ -169,11 +186,12 @@ class Yati:
     @param tweet
         The tweet to store
     """
-    #TODO: Store tweetTableLength as a member var so that this can be O(1) time instead of O(n) time
+    #TODO: Store tweetTableLength as a member var so that this can be
+    #O(1) time instead of O(n) time
     def storeTweet(self, tweet):
         self.tweetTable[self.tweetTableLength] = tweet
         self.tweetTableLength = self.tweetTableLength + 1
-    
+
     """
     Retweets a tweet based on its ID
     --------------------------------
@@ -199,7 +217,7 @@ class Yati:
             if not self.canReTweet:
                 return None
             else:
-                theTweet = self.tweetTable[tweetID-1]
+                theTweet = self.tweetTable[tweetID - 1]
                 self.tw.retweet(theTweet.id)
                 return theTweet
         except KeyError:
@@ -207,15 +225,18 @@ class Yati:
 
     # Serialize tweetTable and write it to file
     def __del__(self):
-      if self.shouldFlushPrevTweets:
-          try:
-            tweetFile = open(USERDIR + '/.__yt__tweets', 'w')
-            pickle.dump(self.tweetTable, tweetFile)
-          except IOError:
-            print 'File write failed'
+        if self.shouldFlushPrevTweets:
+            try:
+                tweetFile = open(USERDIR + '/.__yt__tweets', 'w')
+                pickle.dump(self.tweetTable, tweetFile)
+            except IOError:
+                print 'File write failed'
+
 
 def printUsage():
-    print 'Usage: python yati.py [numberOfTweets] [--update status] [--rt tweet_#]'
+    print 'Usage: '\
+          ' python yati.py [numberOfTweets] [--update status] [--rt tweet_#]'
+
 
 def main():
     numTweets = 10
@@ -231,11 +252,12 @@ def main():
                 tweetID = int(sys.argv[2])
                 isRetweet = True
             except ValueError:
-                print 'Error: bad argument ' + sys.argv[1] + '. Retweet ID must be an integer'
+                print 'Error: bad argument %s. Retweet ID must be an integer' \
+                        % sys.argv[1]
                 printUsage()
                 sys.exit()
         else:
-            try :
+            try:
                 numTweets = int(sys.argv[1])
             except ValueError:
                 print 'Error: bad argument ' + sys.argv[1]
@@ -248,19 +270,24 @@ def main():
     if isStatusUpdate:
         yati.updateStatus(sys.argv[2])
     elif isRetweet:
-          result = yati.retweet(tweetID)
-          if result is 0:
-              print 'Error: unknown failure. Check internet connection possibly'
-              printUsage()
-              sys.exit()
-          elif result is -1:
-              print str(tweetID) + ' is not a valid key. Please enter a valid key and try again'
-              printUsage()
-              sys.exit()
-          elif not result:
-              print 'Retweet failed. Perhaps you have not stored any tweets? Try running just yati.py or yati.py [numTweets] and try again'
-          else: # was successful
-              print 'Retweet of tweet #' + str(tweetID) + ' (' + result.text[:50].encode('utf8') + '...) by @' + result.user.screen_name + ' successful!'
+        result = yati.retweet(tweetID)
+        if result is 0:
+            print 'Error: unknown failure. Check internet connection possibly'
+            printUsage()
+            sys.exit()
+        elif result is -1:
+            print '%s is not a valid key. Please enter a valid key and '\
+                    'try again' % str(tweetID)
+            printUsage()
+            sys.exit()
+        elif not result:
+            print 'Retweet failed. Perhaps you have not stored any tweets? '\
+                'Try running just yati.py or yati.py [numTweets] and try again'
+        else:  # was successful
+            print 'Retweet of tweet #%s (%s...) by @%s successful!' % \
+                  (str(tweetID),
+                   result.text[:50].encode('utf8'),
+                   result.user.screen_name)
 
     else:
         tweets = yati.getTweets(numTweets)
@@ -268,4 +295,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()     
+    main()
