@@ -172,12 +172,7 @@ class Yati:
             sys.stderr.write(
                     "Error: tweets cannot be more than 140 characters")
             return False
-        status = self.tweepy.update_status(unicode(new_status))
-        if status:
-            print status
-            return True
-        else:
-            return False
+        return self.tweepy.update_status(unicode(new_status))
 
     def store_tweets(self, tweets):
         """
@@ -273,7 +268,11 @@ def main():
     if DEBUG:
         print yati.tweet_table
     if is_status_update:
-        yati.update_status(sys.argv[2])
+        status = yati.update_status(sys.argv[2])
+        if status:
+            print 'Status update successful'
+        else:
+            print 'Could not update your status at this time'
     elif is_retweet:
         try:
             result = yati.retweet(tweet_id)
