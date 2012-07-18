@@ -275,7 +275,11 @@ def main():
     if is_status_update:
         yati.update_status(sys.argv[2])
     elif is_retweet:
-        result = yati.retweet(tweet_id)
+        try:
+            result = yati.retweet(tweet_id)
+        except tweepy.error.TweepError as tw_err:
+            print tw_err
+            sys.exit()
         if type(result) is int and result is 0:
             print 'Error: unknown failure. Check internet connection possibly'
             print_usage()
