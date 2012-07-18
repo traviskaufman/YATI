@@ -43,6 +43,8 @@ DEBUG = 0
 
 
 class Yati:
+    """Wrapper for the Twitter Command Line Interface"""
+
     def __init__(self):
         self.config = {
             'CONSUMER_KEY': '3PqhYFkJohEruGu1Oxh85g',
@@ -52,8 +54,9 @@ class Yati:
             'timeZone': 'America/New_York'
         }
 
-        self.shouldFlushPrevTweets = True
-        self.gotTweetsBefore = False  # set true on first call to getTweets()
+        self.should_flush_prev_tweets = True
+        # set true on first call to get_tweets()
+        self.got_tweets_before = False
         #set the current locale
         os.environ['TZ'] = self.config['timeZone']
         time.tzset()
@@ -100,35 +103,47 @@ class Yati:
         auth.set_access_token(self.config['AT_KEY'], self.config['AT_SEC'])
 
         # get the Tweepy API
-        self.tw = tweepy.API(auth)
+        self.tweepy = tweepy.API(auth)
         # them, work with them, etc.
-        self.tweetTable = {}
-        self.tweetTableLength = 0
+        self.tweet_table = {}
+        self.tweet_table_length = 0
         # Load the latest tweets gotten by the program into tweetTable
-        self.canReTweet = True
+        self.can_retweet = True
         try:
-            self.tweetTable = pickle.load(open('%s/.__yt__tweets' % USERDIR,
+            self.tweet_table = pickle.load(open('%s/.__yt__tweets' % USERDIR,
                                           'r'))
-            if not self.tweetTable:
-                self.canReTweet = False
+            if not self.tweet_table:
+                self.can_retweet = False
             else:
-                self.tweetTableLength = len(self.tweetTable)
+                self.tweet_table_length = len(self.tweet_table)
         except IOError:
             print 'Failed to retrieve stored tweets. Make sure you have '\
                   'tweets stored and/or you have file permissions set '\
                   'correctly.'
-            self.canReTweet = False
+            self.can_retweet = False
 
-    # get a certain number of tweets from the home timeline
-    def getTweets(self, max=10):
-        theTweets = self.tw.home_timeline(count=max)
-        self.storeTweets(theTweets)
-        self.gotTweetsBefore = True
-        return theTweets
+    def get_tweets(self, max_tweets=10):
+        """Retrieve tweets from the authorized user's home timeline, starting
+        with the newest and going in descending order.
 
-    # print the tweets
-    def printTweets(self, tweets):
-        h = HTMLParser.HTMLParser()
+        max: (optional) The maximum amount of tweets you'd like to retrieve.
+        Defaults to 10
+
+        returns: A list of tweepy status objects containing information about
+        each tweet
+        """
+        the_tweets = self.tweepy.home_timeline(count=max_tweets)
+        self.store_tweets(the_tweets)
+        self.got_tweets_before = True
+        return the_tweets
+
+    @classmethod
+    def print_tweets(cls, tweets):
+        """Print a list of tweets
+
+        tweets: A list of tweepy status objects
+        """
+        html_parser = HTMLParser.HTMLParser()
         i = 0
         title = "************* RECENT TWEETS ***************"
         print title.encode('utf8')
@@ -139,159 +154,149 @@ class Yati:
             print "#%s: %s (%s)" % (str(i),
                                     tweet.user.screen_name,
                                     tweet.user.name)
-            print h.unescape(tweet.text.encode('utf8'))
+            print html_parser.unescape(tweet.text.encode('utf8'))
             print '----------------------------'
 
-    """
-    Updates your Twitter Status from the command line
-    ---------------------------------------
-    @param status
-        Your status that you want to post. Supports all UTF-8 characters
-    @return boolean
-        True if status update successful, false if not
-    """
-    def updateStatus(self, newStatus):
+    def update_status(self, new_status):
+        """
+        Updates your Twitter Status from the command line
+        ---------------------------------------
+        new_status: Your status that you want to post.
+
+        Returns: True if status update successful, False if not
+        """
         # We aren't getting any new tweets so no reason to flush the tweetTable
-        self.shouldFlushPrevTweets = False
-        maxChars = 140
-        if len(newStatus) > maxChars:
+        self.should_flush_prev_tweets = False
+        max_chars = 140
+        if len(new_status) > max_chars:
             sys.stderr.write(
                     "Error: tweets cannot be more than 140 characters")
             return False
-        status = self.tw.update_status(unicode(newStatus))
+        status = self.tweepy.update_status(unicode(new_status))
         if status:
             print status
             return True
         else:
             return False
 
-    """
-    Stores a list of teepy status objects into a hash table so they can be used
-    in the future
-    ---------------------------------------------------
-    @param *tweets
-        The list of twitter status objects to store
-    """
-    def storeTweets(self, *tweets):
+    def store_tweets(self, tweets):
+        """
+        Stores a list of teepy status objects into a hash table so they can be
+        accessed in the future
+        ---------------------------------------------------
+        tweets: The list of twitter status objects to store
+        """
         if (DEBUG):
             print 'Tweets '
             print tweets
-        if self.shouldFlushPrevTweets and not self.gotTweetsBefore:
-            self.tweetTable = {}
-            self.tweetTableLength = 0
-        [self.storeTweet(tw) for tw in tweets[0]]
-    """
-    Stores an individual tweet. Helpler method for storeTweets()
-    --------------------------------
-    @param tweet
-        The tweet to store
-    """
-    #TODO: Store tweetTableLength as a member var so that this can be
-    #O(1) time instead of O(n) time
-    def storeTweet(self, tweet):
-        self.tweetTable[self.tweetTableLength] = tweet
-        self.tweetTableLength = self.tweetTableLength + 1
+        if self.should_flush_prev_tweets and not self.got_tweets_before:
+            self.tweet_table = {}
+            self.tweet_table_length = 0
+        for tweet in tweets[0]:
+            self.store_tweet(tweet)
 
-    """
-    Retweets a tweet based on its ID
-    --------------------------------
-    @param tweetID
-        The tweetTable key that corresponds to the tweet you'd like to retweet.
-        Users will be able to identify this by the "#X" before each tweet,
-        where X is the integer value that corresponds to the dictionaries key.
-        I know what you may be thinking, why don't I just use an array? The
-        answer is because: 1) Since dictionaries are essentially ordered maps
-        the functionality is more extendable 2) The overhead cost compared to
-        arrays are very minimal 3) Pickle loads up its stored objects into a
-        dictionary, so I'll stick with the way Pickle does it
+    def store_tweet(self, tweet):
+        """
+        Stores an individual tweet. Helpler method for store_tweets()
+        --------------------------------
+        tweet: The tweet to store
+        """
+        self.tweet_table[self.tweet_table_length] = tweet
+        self.tweet_table_length = self.tweet_table_length + 1
 
-    @return tweepy.status object | integer
-        If sucessful, this will return the status object that was retweeted. If
-        unsuccessful, it will return some sort of error code that will give an
-        indication as to why the retweet failed. Error codes thus far are:
-        0: The tweepy call failed
-        -1: User input an integer key that did not exist
-    """
-    def retweet(self, tweetID):
+    def retweet(self, tweet_id):
+        """
+        Retweets a tweet based on its ID
+        --------------------------------
+        @param tweet_id
+            The tweetTable key that corresponds to the tweet
+            you'd like to retweet.
+            Users will be able to identify this by the "#X" before each tweet,
+            where X is the int value that corresponds to the dictionary's key.
+
+        Returns: a tweepy.status object on success
+        """
         try:
-            if not self.canReTweet:
+            if not self.can_retweet:
                 return None
             else:
-                theTweet = self.tweetTable[tweetID - 1]
-                self.tw.retweet(theTweet.id)
-                return theTweet
+                the_tweet = self.tweet_table[tweet_id - 1]
+                self.tweepy.retweet(the_tweet.id)
+                return the_tweet
         except KeyError:
             return -1
 
     # Serialize tweetTable and write it to file
     def __del__(self):
-        if self.shouldFlushPrevTweets:
+        if self.should_flush_prev_tweets:
             try:
-                tweetFile = open(USERDIR + '/.__yt__tweets', 'w')
-                pickle.dump(self.tweetTable, tweetFile)
+                tweet_file = open(USERDIR + '/.__yt__tweets', 'w')
+                pickle.dump(self.tweet_table, tweet_file)
             except IOError:
                 print 'File write failed'
 
 
-def printUsage():
+def print_usage():
+    """Print program usage."""
     print 'Usage: '\
           ' python yati.py [numberOfTweets] [--update status] [--rt tweet_#]'
 
 
 def main():
-    numTweets = 10
-    tweetID = None
-    isStatusUpdate = False
-    isRetweet = False
+    """Where the magic happens"""
+    num_tweets = 10
+    tweet_id = None
+    is_status_update = False
+    is_retweet = False
     if len(sys.argv) > 1:
         # check integrity of sys.argv[2]
         if sys.argv[1] == "--update" and sys.argv[2] != None:
-            isStatusUpdate = True
+            is_status_update = True
         elif sys.argv[1] == "--rt" and sys.argv[2] != None:
             try:
-                tweetID = int(sys.argv[2])
-                isRetweet = True
+                tweet_id = int(sys.argv[2])
+                is_retweet = True
             except ValueError:
                 print 'Error: bad argument %s. Retweet ID must be an integer' \
                         % sys.argv[1]
-                printUsage()
+                print_usage()
                 sys.exit()
         else:
             try:
-                numTweets = int(sys.argv[1])
+                num_tweets = int(sys.argv[1])
             except ValueError:
                 print 'Error: bad argument ' + sys.argv[1]
-                printUsage()
+                print_usage()
                 sys.exit()
 
     yati = Yati()
     if DEBUG:
-        print yati.tweetTable
-    if isStatusUpdate:
-        yati.updateStatus(sys.argv[2])
-    elif isRetweet:
-        result = yati.retweet(tweetID)
-        if result is 0:
+        print yati.tweet_table
+    if is_status_update:
+        yati.update_status(sys.argv[2])
+    elif is_retweet:
+        result = yati.retweet(tweet_id)
+        if type(result) is int and result is 0:
             print 'Error: unknown failure. Check internet connection possibly'
-            printUsage()
+            print_usage()
             sys.exit()
-        elif result is -1:
+        elif type(result) is int and result is -1:
             print '%s is not a valid key. Please enter a valid key and '\
-                    'try again' % str(tweetID)
-            printUsage()
+                    'try again' % str(tweet_id)
+            print_usage()
             sys.exit()
         elif not result:
             print 'Retweet failed. Perhaps you have not stored any tweets? '\
                 'Try running just yati.py or yati.py [numTweets] and try again'
         else:  # was successful
             print 'Retweet of tweet #%s (%s...) by @%s successful!' % \
-                  (str(tweetID),
+                  (str(tweet_id),
                    result.text[:50].encode('utf8'),
                    result.user.screen_name)
 
     else:
-        tweets = yati.getTweets(numTweets)
-        yati.printTweets(tweets)
+        tweets = yati.get_tweets(max_tweets=num_tweets)
+        Yati.print_tweets(tweets)
 
 
 if __name__ == "__main__":
