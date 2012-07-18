@@ -1,0 +1,4 @@
+desc("Lint the code")
+task :lint do
+  sh 'pylint -f colorized yati.py'
+end
