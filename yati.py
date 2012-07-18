@@ -192,7 +192,7 @@ class Yati:
         if self.should_flush_prev_tweets and not self.got_tweets_before:
             self.tweet_table = {}
             self.tweet_table_length = 0
-        for tweet in tweets[0]:
+        for tweet in tweets:
             self.store_tweet(tweet)
 
     def store_tweet(self, tweet):
