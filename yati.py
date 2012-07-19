@@ -29,7 +29,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see http://www.gnu.org/licenses.
 """
 __author__ = "Travis Kaufman"
-__version__ = "2.1.x-dev"
 
 import tweepy
 import time
