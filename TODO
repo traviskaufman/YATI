@@ -1,8 +1,7 @@
-Better message for status update
+ACTUALLY set the current timezone based on user's timezone
 ArgParser
 Easy_Install
 Move USERDIR global into config
 Make authentication storage WAY more secure
-Go back and comment everything the right way
 Put all member variables in one place
 UNIT TESTS
