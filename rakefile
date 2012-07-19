@@ -2,3 +2,7 @@ desc("Lint the code")
 task :lint do
   sh 'pylint -f colorized yati.py'
 end
+
+task :buildout do
+  sh 'python setup.py install'
+end
