@@ -16,8 +16,8 @@ HOW TO USE:
     $ python yati.py --update [your\_status\_update]
 #### To retweet a status: 
     $ python yati.py --rt [tweet\_#] 
-    *Note: The tweet # will appear as the #N right before the tweet when you make a call to Yati. 
-     e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2*
+  *Note: The tweet # will appear as the #N right before the tweet when you make a call to Yati. 
+  e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2*
 
 Copyright (C) 2012 Travis Kaufman
 ----------------------------------
