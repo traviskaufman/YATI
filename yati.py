@@ -116,9 +116,6 @@ class Yati:
             else:
                 self.tweet_table_length = len(self.tweet_table)
         except IOError:
-            print 'Failed to retrieve stored tweets. Make sure you have '\
-                  'tweets stored and/or you have file permissions set '\
-                  'correctly.'
             self.can_retweet = False
 
     def get_tweets(self, max_tweets=10):
