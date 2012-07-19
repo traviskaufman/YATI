@@ -24,6 +24,10 @@ Installation:
 
         $ cd path/to/yati/
         $ python setup.py install
+        
+   Alternatively, if you like ruby and have rake installed (which if you're not, get on it):
+   
+        $ rake buildout
 
 How To Use:
 ------------
