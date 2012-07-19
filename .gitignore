@@ -1,4 +1,5 @@
 twitterDoc.html
 .DS_Store
 *.swp
+*.pyc
 build/
