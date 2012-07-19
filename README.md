@@ -12,15 +12,18 @@ Installation:
 
 1. If you don't have it already, install tweepy:
 
-    $ [sudo] easy_install tweepy
+        $ [sudo] easy_install tweepy
 
-2.    
 
-    $ git clone https://github.com/traviskaufman/YATI.git
+2. Clone the repo    
 
-3.
-    $ cd path/to/yati/
-    $ python setup.py install
+        $ git clone https://github.com/traviskaufman/YATI.git
+
+
+3. Run the setup script
+
+        $ cd path/to/yati/
+        $ python setup.py install
 
 How To Use:
 ------------
