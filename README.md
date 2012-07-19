@@ -13,9 +13,9 @@ HOW TO USE:
 #### To get the X newest tweets on your home timeline:
     $ python yati.py X
 #### To update your status: 
-    $ python yati.py --update [your\_status\_update]
+    $ python yati.py --update [your_status_update]
 #### To retweet a status: 
-    $ python yati.py --rt [tweet\_#] 
+    $ python yati.py --rt [tweet_#] 
   *Note: The tweet # will appear as the #N right before the tweet when you make a call to Yati. 
   e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2*
 
