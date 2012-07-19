@@ -1,5 +1,5 @@
-YATI (Yet Another Twitter Interface) - A TWITTER CLI FOR GEEKS
-===============================================================
+YATI (Yet Another Twitter Interface) - A TWITTER CLI
+=====================================================
 Starting as a bored-one-night hack home feed scraper, YATI is now (turning into?) a full-blown twitter CLI, with the ability to retrieve any number of tweets from your home timeline, post status updates, and retweet statuses.
 More features, such as being able to retrieve tweets from specific friends, get mentions, etc. will be added in the future!
 
@@ -8,13 +8,13 @@ This program is made possible by the awesome Tweepy library (https://github.com/
 
 HOW TO USE:
 ------------
-* To get the 10 newest tweets on your home timeline: 
+#### To get the 10 newest tweets on your home timeline: 
     $ python yati.py 
-* To get the X newest tweets on your home timeline:
+#### To get the X newest tweets on your home timeline:
     $ python yati.py X
-* To update your status: 
+#### To update your status: 
     $ python yati.py --update [your\_status\_update]
-* To retweet a status: 
+#### To retweet a status: 
     $ python yati.py --rt [tweet\_#] 
     *Note: The tweet # will appear as the #N right before the tweet when you make a call to Yati. 
      e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2*
