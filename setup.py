@@ -10,5 +10,6 @@ setup(name='yati',
       url='https://github.com/traviskaufman/YATI',
       download_url='https://github.com/traviskaufman/YATI/zipball/master',
       license='GPL',
-      py_modules=['yati']
+      py_modules=['yati'],
+      scripts=['bin/yati']
 )

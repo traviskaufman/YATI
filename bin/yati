@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+
+import yati
+
+if __name__ == '__main__':
+  yati.main()
