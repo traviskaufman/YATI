@@ -36,6 +36,7 @@ import os
 import sys
 import pickle
 import HTMLParser
+import argparse
 
 USERDIR = os.getenv("HOME")
 DEBUG = 0
@@ -235,43 +236,42 @@ def print_usage():
 
 def main():
     """Where the magic happens"""
-    num_tweets = 10
-    tweet_id = None
-    is_status_update = False
-    is_retweet = False
-    if len(sys.argv) > 1:
-        # check integrity of sys.argv[2]
-        if sys.argv[1] == "--update" and sys.argv[2] != None:
-            is_status_update = True
-        elif sys.argv[1] == "--rt" and sys.argv[2] != None:
-            try:
-                tweet_id = int(sys.argv[2])
-                is_retweet = True
-            except ValueError:
-                print 'Error: bad argument %s. Retweet ID must be an integer' \
-                        % sys.argv[1]
-                print_usage()
-                sys.exit()
-        else:
-            try:
-                num_tweets = int(sys.argv[1])
-            except ValueError:
-                print 'Error: bad argument ' + sys.argv[1]
-                print_usage()
-                sys.exit()
+    parser = argparse.ArgumentParser(
+            description="A Python-based Twitter CLI")
+    parser.add_argument("num_tweets",
+                        metavar="NUM_TWEETS",
+                        type=int,
+                        default=10,
+                        const=10,
+                        nargs='?',
+                        help="The Number of tweets you'd like to retrieve" \
+                        " (defaults to 10)")
+    parser.add_argument("-u, --update",
+                        type=str,
+                        dest='status_update',
+                        nargs=1,
+                        help="The status update you would like to post")
+    parser.add_argument("-r, --retweet",
+                        type=int,
+                        dest='rt_tweet_id',
+                        help="The ID of the tweet that you would like to" \
+                        " retweet")
+    args = parser.parse_args()
 
     yati = Yati()
     if DEBUG:
         print yati.tweet_table
-    if is_status_update:
-        status = yati.update_status(sys.argv[2])
+    if args.status_update:
+        status = yati.update_status(args.status_update)
         if status:
             print 'Status update successful'
         else:
             print 'Could not update your status at this time'
-    elif is_retweet:
+        sys.exit()
+
+    if args.rt_tweet_id:
         try:
-            result = yati.retweet(tweet_id)
+            result = yati.retweet(args.rt_tweet_id)
         except tweepy.error.TweepError as tw_err:
             print tw_err
             sys.exit()
@@ -281,22 +281,23 @@ def main():
             sys.exit()
         elif type(result) is int and result is -1:
             print '%s is not a valid key. Please enter a valid key and '\
-                    'try again' % str(tweet_id)
+                    'try again' % str(args.rt_tweet_id)
             print_usage()
             sys.exit()
         elif not result:
             print 'Retweet failed. Perhaps you have not stored any tweets? '\
                 'Try running just yati.py or yati.py [numTweets] and try again'
+            sys.exit()
         else:  # was successful
             print 'Retweet of tweet #%s (%s...) by @%s successful!' % \
-                  (str(tweet_id),
+                  (str(args.rt_tweet_id),
                    result.text[:50].encode('utf8'),
                    result.user.screen_name)
+            sys.exit()
 
-    else:
-        tweets = yati.get_tweets(max_tweets=num_tweets)
-        Yati.print_tweets(tweets)
-
+    # Take the default action if no flags specified
+    tweets = yati.get_tweets(max_tweets=args.num_tweets)
+    Yati.print_tweets(tweets)
 
 if __name__ == "__main__":
     main()
