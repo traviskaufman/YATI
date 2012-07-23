@@ -228,20 +228,13 @@ class Yati:
                 print 'File write failed'
 
 
-def print_usage():
-    """Print program usage."""
-    print 'Usage: '\
-          ' python yati.py [numberOfTweets] [--update status] [--rt tweet_#]'
-
-
 def main():
     """Where the magic happens"""
     parser = argparse.ArgumentParser(
             description="A Python-based Twitter CLI")
-    parser.add_argument("num_tweets",
-                        metavar="NUM_TWEETS",
+    parser.add_argument("-g, --get-tweets",
+                        dest="num_tweets_to_get",
                         type=int,
-                        default=10,
                         const=10,
                         nargs='?',
                         help="The Number of tweets you'd like to retrieve" \
@@ -249,7 +242,6 @@ def main():
     parser.add_argument("-u, --update",
                         type=str,
                         dest='status_update',
-                        nargs=1,
                         help="The status update you would like to post")
     parser.add_argument("-r, --retweet",
                         type=int,
@@ -261,15 +253,22 @@ def main():
     yati = Yati()
     if DEBUG:
         print yati.tweet_table
+
+    # Print usage if no args. Eventually, no args will kick the program into a
+    # REPL
+    if len(sys.argv) < 2:
+        parser.print_usage()
+        sys.exit()
+
     if args.status_update:
         status = yati.update_status(args.status_update)
         if status:
             print 'Status update successful'
         else:
             print 'Could not update your status at this time'
-        sys.exit()
 
     if args.rt_tweet_id:
+        print args.rt_tweet_id
         try:
             result = yati.retweet(args.rt_tweet_id)
         except tweepy.error.TweepError as tw_err:
@@ -277,12 +276,12 @@ def main():
             sys.exit()
         if type(result) is int and result is 0:
             print 'Error: unknown failure. Check internet connection possibly'
-            print_usage()
+            parser.print_usage()
             sys.exit()
         elif type(result) is int and result is -1:
             print '%s is not a valid key. Please enter a valid key and '\
                     'try again' % str(args.rt_tweet_id)
-            print_usage()
+            parser.print_usage()
             sys.exit()
         elif not result:
             print 'Retweet failed. Perhaps you have not stored any tweets? '\
@@ -293,11 +292,10 @@ def main():
                   (str(args.rt_tweet_id),
                    result.text[:50].encode('utf8'),
                    result.user.screen_name)
-            sys.exit()
 
-    # Take the default action if no flags specified
-    tweets = yati.get_tweets(max_tweets=args.num_tweets)
-    Yati.print_tweets(tweets)
+    if args.num_tweets_to_get:
+        tweets = yati.get_tweets(max_tweets=args.num_tweets_to_get)
+        Yati.print_tweets(tweets)
 
 if __name__ == "__main__":
     main()
