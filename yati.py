@@ -51,15 +51,11 @@ class Yati:
             'CONSUMER_SECRET': 'TNmjRcWKMMecAbTJm7WuB8H63xp5GJjvS9y1dWhC0',
             'AT_KEY': '',
             'AT_SEC': '',
-            'timeZone': 'America/New_York'
         }
 
         self.should_flush_prev_tweets = True
         # set true on first call to get_tweets()
         self.got_tweets_before = False
-        #set the current locale
-        os.environ['TZ'] = self.config['timeZone']
-        time.tzset()
 
         #authorize the user
         auth = tweepy.OAuthHandler(self.config['CONSUMER_KEY'],
