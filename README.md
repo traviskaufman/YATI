@@ -27,7 +27,9 @@ Installation:
         
    Alternatively, if you like ruby and have rake installed (which if you're not, get on it):
    
-        $ rake buildout
+        $ rake build          # Build, but don't install, the application
+        $ rake buildinstall   # Build and install the application
+        $ rake lint           # Lint the code (requires pyLint) 
 
 How To Use:
 ------------
