@@ -46,7 +46,7 @@ class Yati:
     """Wrapper for the Twitter Command Line Interface"""
 
     def __init__(self):
-        self.config = {
+        self._config = {
             'CONSUMER_KEY': '3PqhYFkJohEruGu1Oxh85g',
             'CONSUMER_SECRET': 'TNmjRcWKMMecAbTJm7WuB8H63xp5GJjvS9y1dWhC0',
             'AT_KEY': '',
@@ -58,17 +58,17 @@ class Yati:
         self.got_tweets_before = False
 
         #authorize the user
-        auth = tweepy.OAuthHandler(self.config['CONSUMER_KEY'],
-                                   self.config['CONSUMER_SECRET'])
+        auth = tweepy.OAuthHandler(self._config['CONSUMER_KEY'],
+                                   self._config['CONSUMER_SECRET'])
         try:
             authfile = open(USERDIR + '/.yti', 'r')
             authkeys = authfile.readlines()
-            self.config['AT_KEY'] = authkeys[0][:-1]
+            self._config['AT_KEY'] = authkeys[0][:-1]
             if DEBUG:
-                print 'AT_KEY: ' + self.config['AT_KEY'] + '\n'
-            self.config['AT_SEC'] = authkeys[1][:-1]
+                print 'AT_KEY: ' + self._config['AT_KEY'] + '\n'
+            self._config['AT_SEC'] = authkeys[1][:-1]
             if DEBUG:
-                print 'AT_SEC: ' + self.config['AT_SEC'] + '\n'
+                print 'AT_SEC: ' + self._config['AT_SEC'] + '\n'
         except IOError:
             auth_url = auth.get_authorization_url()
             sys.stderr.write(
@@ -81,10 +81,10 @@ class Yati:
             os.system('open ' + auth_url)
             verifier = raw_input('PIN: ').strip()
             auth.get_access_token(verifier)
-            self.config['AT_KEY'] = auth.access_token.key
-            self.config['AT_SEC'] = auth.access_token.secret
-            authkeys = ["%s\n" % self.config['AT_KEY'],
-                        "%s\n" % self.config['AT_SEC'],
+            self._config['AT_KEY'] = auth.access_token.key
+            self._config['AT_SEC'] = auth.access_token.secret
+            authkeys = ["%s\n" % self._config['AT_KEY'],
+                        "%s\n" % self._config['AT_SEC'],
                         'end']
             try:
                 authfile = open(USERDIR + '/.yti', 'w')
@@ -96,7 +96,7 @@ class Yati:
                     "You may have to re-authorize when you use this app. "\
                     "To prevent this from happening, check disk space and/or "\
                     "file permissions and try again.")
-        auth.set_access_token(self.config['AT_KEY'], self.config['AT_SEC'])
+        auth.set_access_token(self._config['AT_KEY'], self._config['AT_SEC'])
 
         # get the Tweepy API
         self.tweepy = tweepy.API(auth)
