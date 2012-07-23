@@ -228,18 +228,18 @@ def main():
     """Where the magic happens"""
     parser = argparse.ArgumentParser(
             description="A Python-based Twitter CLI")
-    parser.add_argument("-g, --get-tweets",
+    parser.add_argument("-g", "--get_tweets",
                         dest="num_tweets_to_get",
                         type=int,
                         const=10,
                         nargs='?',
                         help="The Number of tweets you'd like to retrieve" \
                         " (defaults to 10)")
-    parser.add_argument("-u, --update",
+    parser.add_argument("-u", "--update",
                         type=str,
                         dest='status_update',
                         help="The status update you would like to post")
-    parser.add_argument("-r, --retweet",
+    parser.add_argument("-r", "--retweet",
                         type=int,
                         dest='rt_tweet_id',
                         help="The ID of the tweet that you would like to" \
