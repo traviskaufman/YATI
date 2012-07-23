@@ -34,15 +34,18 @@ Installation:
 How To Use:
 ------------
 #### To get the 10 newest tweets on your home timeline: 
-    $ python yati.py [-g, --get-tweets]
+    $ yati [-g, --get-tweets]
 #### To get the X newest tweets on your home timeline:
-    $ python yati.py [-g, --get-tweets X]
+    $ yati [-g, --get-tweets X]
 #### To update your status: 
-    $ python yati.py [-u, --update your_status_update]
+    $ yati [-u, --update your_status_update]
 #### To retweet a status: 
-    $ python yati.py [-r, --retweet tweet_id]
+    $ yati [-r, --retweet tweet_id]
   *Note: The tweet_id will appear as the #N right before the tweet when you make a call to Yati. 
   e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2*
+#### TL;DR:
+    $ usage: yati [-h] [-g, --get-tweets [NUM_TWEETS_TO_GET]]
+                [-u, --update STATUS_UPDATE] [-r, --retweet RT_TWEET_ID] 
 
 Copyright (C) 2012 Travis Kaufman
 ----------------------------------
