@@ -3,6 +3,12 @@ task :lint do
   sh 'pylint -f colorized yati.py'
 end
 
-task :buildout do
+desc("Build and install the application")
+task :buildinstall do
   sh 'python setup.py install'
+end
+
+desc("Build, but don't install, the application")
+task :build do 
+  sh 'python setup.py build'
 end
