@@ -3,16 +3,6 @@
 YATI (Yet Another Twitter Interface) - A TWITTER CLI FOR GEEKS
 ****************************
 
-HOW TO USE:
----------------------------------
-* To get the 10 newest tweets on your home timeline: $ python yati.py
-* To get the X newest tweets on your home timeline: $ python yati.py X
-* To update your status: $ python yati.py --update [your_status_update]
-* To retweet a status (NEW!!): $ python yati.py --rt [tweet_#]
-        **Note: The tweet # will appear as the #N right before the tweet when
-        you make a call to Yati.
-        e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2
-
 Copyright (C) 2012 Travis Kaufman
 ----------------------------------
 This program is free software: you can redistribute it and/or modify
