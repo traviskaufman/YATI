@@ -222,16 +222,17 @@ def main():
                         type=int,
                         const=10,
                         nargs='?',
-                        help="The Number of tweets you'd like to retrieve" \
-                        " (defaults to 10)")
+                        help="Retrieve a certain number of tweets from your" \
+                        " home timeline (defaults to 10)")
     parser.add_argument("-u", "--update",
                         type=str,
                         dest='status_update',
-                        help="The status update you would like to post")
+                        help="Update your status")
     parser.add_argument("-r", "--retweet",
                         type=int,
                         dest='rt_tweet_id',
-                        help="The ID of the tweet that you would like to" \
+                        help="Retweet a status with ID #N, where N is the" \
+                        " number that prefixes the status you'd like to" \
                         " retweet")
     args = parser.parse_args()
 
