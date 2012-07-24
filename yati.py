@@ -186,11 +186,10 @@ class Yati:
         """
         Retweets a tweet based on its ID
         --------------------------------
-        @param tweet_id
-            The tweetTable key that corresponds to the tweet
-            you'd like to retweet.
-            Users will be able to identify this by the "#X" before each tweet,
-            where X is the int value that corresponds to the dictionary's key.
+        tweet_id: The tweetTable key that corresponds to the tweet
+        you'd like to retweet. Users will be able to identify this
+        by the "#X" before each tweet, where X is the int value that
+        corresponds to the dictionary's key.
 
         Returns: a tweepy.status object on success
         """
