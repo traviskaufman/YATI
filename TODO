@@ -1,8 +1,6 @@
-Rm DEBUG
 Better way to map CL args to functions
 Allow batch request based on order of CL args
 Easy_Install
-Move USERDIR global into config
 Make authentication storage WAY more secure
 Put all member variables in one place
 UNIT TESTS

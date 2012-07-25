@@ -40,10 +40,12 @@ class Yati:
             'AT_SEC': '',
             'USERDIR': os.getenv("HOME")
         }
-
-        self.should_flush_prev_tweets = True
-        # set true on first call to get_tweets()
-        self.got_tweets_before = False
+        self._tweepy = None
+        self._should_flush_prev_tweets = True
+        self._got_tweets_before = False
+        self._tweet_table = {}
+        self._tweet_table_length = 0
+        self._can_retweet = True
 
         #authorize the user
         auth = tweepy.OAuthHandler(self._config['CONSUMER_KEY'],
@@ -83,22 +85,17 @@ class Yati:
         auth.set_access_token(self._config['AT_KEY'], self._config['AT_SEC'])
 
         # get the Tweepy API
-        self.tweepy = tweepy.API(auth)
-        # them, work with them, etc.
-        self.tweet_table = {}
-        self.tweet_table_length = 0
-        # Load the latest tweets gotten by the program into tweetTable
-        self.can_retweet = True
+        self._tweepy = tweepy.API(auth)
         try:
-            self.tweet_table = pickle.load(open(
+            self._tweet_table = pickle.load(open(
                             '%s/.__yt__tweets' % self._config['USERDIR'],
                             'r'))
-            if not self.tweet_table:
-                self.can_retweet = False
+            if not self._tweet_table:
+                self._can_retweet = False
             else:
-                self.tweet_table_length = len(self.tweet_table)
+                self._tweet_table_length = len(self._tweet_table)
         except IOError:
-            self.can_retweet = False
+            self._can_retweet = False
 
     def get_tweets(self, max_tweets=10):
         """Retrieve tweets from the authorized user's home timeline, starting
@@ -110,9 +107,9 @@ class Yati:
         returns: A list of tweepy status objects containing information about
         each tweet
         """
-        the_tweets = self.tweepy.home_timeline(count=max_tweets)
+        the_tweets = self._tweepy.home_timeline(count=max_tweets)
         self.store_tweets(the_tweets)
-        self.got_tweets_before = True
+        self._got_tweets_before = True
         return the_tweets
 
     @classmethod
@@ -144,13 +141,13 @@ class Yati:
         Returns: True if status update successful, False if not
         """
         # We aren't getting any new tweets so no reason to flush the tweetTable
-        self.should_flush_prev_tweets = False
+        self._should_flush_prev_tweets = False
         max_chars = 140
         if len(new_status) > max_chars:
             sys.stderr.write(
                     "Error: tweets cannot be more than 140 characters")
             return False
-        return self.tweepy.update_status(unicode(new_status))
+        return self._tweepy.update_status(unicode(new_status))
 
     def store_tweets(self, tweets):
         """
@@ -159,9 +156,9 @@ class Yati:
         ---------------------------------------------------
         tweets: The list of twitter status objects to store
         """
-        if self.should_flush_prev_tweets and not self.got_tweets_before:
-            self.tweet_table = {}
-            self.tweet_table_length = 0
+        if self._should_flush_prev_tweets and not self._got_tweets_before:
+            self._tweet_table = {}
+            self._tweet_table_length = 0
         for tweet in tweets:
             self.store_tweet(tweet)
 
@@ -171,8 +168,8 @@ class Yati:
         --------------------------------
         tweet: The tweet to store
         """
-        self.tweet_table[self.tweet_table_length] = tweet
-        self.tweet_table_length = self.tweet_table_length + 1
+        self._tweet_table[self._tweet_table_length] = tweet
+        self._tweet_table_length = self._tweet_table_length + 1
 
     def retweet(self, tweet_id):
         """
@@ -186,22 +183,22 @@ class Yati:
         Returns: a tweepy.status object on success
         """
         try:
-            if not self.can_retweet:
+            if not self._can_retweet:
                 return None
             else:
-                the_tweet = self.tweet_table[tweet_id - 1]
-                self.tweepy.retweet(the_tweet.id)
+                the_tweet = self._tweet_table[tweet_id - 1]
+                self._tweepy.retweet(the_tweet.id)
                 return the_tweet
         except KeyError:
             return -1
 
     # Serialize tweetTable and write it to file
     def __del__(self):
-        if self.should_flush_prev_tweets:
+        if self._should_flush_prev_tweets:
             try:
                 tweet_file = open(self._config['USERDIR'] + '/.__yt__tweets',
                                   'w')
-                pickle.dump(self.tweet_table, tweet_file)
+                pickle.dump(self._tweet_table, tweet_file)
             except IOError:
                 print 'File write failed'
 
