@@ -90,8 +90,9 @@ class Yati:
         # Load the latest tweets gotten by the program into tweetTable
         self.can_retweet = True
         try:
-            self.tweet_table = pickle.load(open('%s/.__yt__tweets' % self._config['USERDIR'],
-                                          'r'))
+            self.tweet_table = pickle.load(open(
+                            '%s/.__yt__tweets' % self._config['USERDIR'],
+                            'r'))
             if not self.tweet_table:
                 self.can_retweet = False
             else:
@@ -244,7 +245,6 @@ def main():
             print 'Could not update your status at this time'
 
     if args.rt_tweet_id:
-        print args.rt_tweet_id
         try:
             result = yati.retweet(args.rt_tweet_id)
         except tweepy.error.TweepError as tw_err:
