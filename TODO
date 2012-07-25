@@ -1,3 +1,4 @@
+Rm DEBUG
 Better way to map CL args to functions
 Allow batch request based on order of CL args
 Easy_Install

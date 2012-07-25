@@ -28,9 +28,6 @@ import pickle
 import HTMLParser
 import argparse
 
-USERDIR = os.getenv("HOME")
-DEBUG = 0
-
 
 class Yati:
     """Wrapper for the Twitter Command Line Interface"""
@@ -41,6 +38,7 @@ class Yati:
             'CONSUMER_SECRET': 'TNmjRcWKMMecAbTJm7WuB8H63xp5GJjvS9y1dWhC0',
             'AT_KEY': '',
             'AT_SEC': '',
+            'USERDIR': os.getenv("HOME")
         }
 
         self.should_flush_prev_tweets = True
@@ -51,14 +49,10 @@ class Yati:
         auth = tweepy.OAuthHandler(self._config['CONSUMER_KEY'],
                                    self._config['CONSUMER_SECRET'])
         try:
-            authfile = open(USERDIR + '/.yti', 'r')
+            authfile = open(self._config['USERDIR'] + '/.yti', 'r')
             authkeys = authfile.readlines()
             self._config['AT_KEY'] = authkeys[0][:-1]
-            if DEBUG:
-                print 'AT_KEY: ' + self._config['AT_KEY'] + '\n'
             self._config['AT_SEC'] = authkeys[1][:-1]
-            if DEBUG:
-                print 'AT_SEC: ' + self._config['AT_SEC'] + '\n'
         except IOError:
             auth_url = auth.get_authorization_url()
             sys.stderr.write(
@@ -77,7 +71,7 @@ class Yati:
                         "%s\n" % self._config['AT_SEC'],
                         'end']
             try:
-                authfile = open(USERDIR + '/.yti', 'w')
+                authfile = open(self._config['USERDIR'] + '/.yti', 'w')
                 authfile.writelines(authkeys)
                 authfile.close()
                 sys.stderr.write("Successfully authorized!\n")
@@ -96,7 +90,7 @@ class Yati:
         # Load the latest tweets gotten by the program into tweetTable
         self.can_retweet = True
         try:
-            self.tweet_table = pickle.load(open('%s/.__yt__tweets' % USERDIR,
+            self.tweet_table = pickle.load(open('%s/.__yt__tweets' % self._config['USERDIR'],
                                           'r'))
             if not self.tweet_table:
                 self.can_retweet = False
@@ -164,9 +158,6 @@ class Yati:
         ---------------------------------------------------
         tweets: The list of twitter status objects to store
         """
-        if (DEBUG):
-            print 'Tweets '
-            print tweets
         if self.should_flush_prev_tweets and not self.got_tweets_before:
             self.tweet_table = {}
             self.tweet_table_length = 0
@@ -207,7 +198,8 @@ class Yati:
     def __del__(self):
         if self.should_flush_prev_tweets:
             try:
-                tweet_file = open(USERDIR + '/.__yt__tweets', 'w')
+                tweet_file = open(self._config['USERDIR'] + '/.__yt__tweets',
+                                  'w')
                 pickle.dump(self.tweet_table, tweet_file)
             except IOError:
                 print 'File write failed'
@@ -237,8 +229,6 @@ def main():
     args = parser.parse_args()
 
     yati = Yati()
-    if DEBUG:
-        print yati.tweet_table
 
     # Print usage if no args. Eventually, no args will kick the program into a
     # REPL
