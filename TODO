@@ -1,6 +1,7 @@
+Refactor __init__
+  ** Have authorization method be successful only if auth.set_access_token is successful
 Better way to map CL args to functions
 Allow batch request based on order of CL args
 Easy_Install
 Make authentication storage WAY more secure
-Put all member variables in one place
 UNIT TESTS
