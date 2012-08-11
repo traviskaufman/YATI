@@ -59,7 +59,7 @@ class Yati:
             self._config['AT_KEY'] = authkeys[0][:-1]
             self._config['AT_SEC'] = authkeys[1][:-1]
         except IOError:
-            open_cmd = 'open' if self._is_mac() else 'xgd-open'
+            open_cmd = 'open' if self._is_mac() else 'xdg-open'
             auth_url = auth.get_authorization_url()
             sys.stderr.write(
                 "***NOTICE: Authorization required.***\nA URL will soon open "\
@@ -68,7 +68,12 @@ class Yati:
                 " doesn't open, please paste the following into your web "\
                 " browser: %s\n" % auth_url)
             time.sleep(3)
-            subprocess.call([open_cmd, auth_url])
+            dev_null = open(os.devnull)
+            subprocess.call("%s %s" % (open_cmd, auth_url),
+                             shell=True,
+                             stdout=dev_null,
+                             stderr=dev_null)
+            dev_null.close()
             verifier = raw_input('PIN: ').strip()
             auth.get_access_token(verifier)
             self._config['AT_KEY'] = auth.access_token.key
