@@ -1,6 +1,18 @@
 #!/usr/bin/env python
-import os
 from setuptools import setup, find_packages
+
+long_desc = """
+Starting as a bored-one-night hack home feed scraper, YATI is now (turning
+into?) a full-blown twitter CLI, with the ability to retrieve any number of
+tweets from your home timeline, post status updates, and retweet statuses. You
+can do cool things with YATI, like hooking it up to a crontab and embedding a
+subshell on your desktop to get the latest tweets right there, or integrate it
+into your Jenkins servers for up-to-the-minute broadcasts on your build
+statuses.
+
+More features, such as being able to retrieve tweets from specific friends, get
+mentions, etc. will be added in the future!
+"""
 
 setup(name='yati',
       version='1.0.0dev',
@@ -18,5 +30,5 @@ setup(name='yati',
           ]
       },
       py_modules=['yati'],
-      long_description=open(os.getcwd() + '/README.md').read()
+      long_description=long_desc
 )
