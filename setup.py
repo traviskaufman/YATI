@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 from setuptools import setup, find_packages
 
 setup(name='yati',
@@ -17,5 +18,5 @@ setup(name='yati',
           ]
       },
       py_modules=['yati'],
-      long_description=open('README.md').read()
+      long_description=open(os.getcwd() + '/README.md').read()
 )
