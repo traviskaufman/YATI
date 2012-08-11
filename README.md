@@ -1,15 +1,25 @@
 YATI (Yet Another Twitter Interface) - A Twitter CLI
 =====================================================
-Starting as a bored-one-night hack home feed scraper, YATI is now (turning into?) a full-blown twitter CLI, with the ability to retrieve any number of tweets from your home timeline, post status updates, and retweet statuses. You can do cool things with YATI, like hooking it up to a crontab and embedding a subshell on your desktop to get the latest tweets right there, or integrate it into your Jenkins servers for up-to-the-minute broadcasts on your build statuses.
+Starting as a bored-one-night hack home feed scraper, YATI is now (turning
+into?) a full-blown twitter CLI, with the ability to retrieve any number of
+tweets from your home timeline, post status updates, and retweet statuses. You
+can do cool things with YATI, like hooking it up to a crontab and embedding a
+subshell on your desktop to get the latest tweets right there, or integrate it
+into your Jenkins servers for up-to-the-minute broadcasts on your build
+statuses.
 
-More features, such as being able to retrieve tweets from specific friends, get mentions, etc. will be added in the future!
+More features, such as being able to retrieve tweets from specific friends, get
+mentions, etc. will be added in the future!
 
 
-This program is made possible by the awesome [Tweepy library](https://github.com/tweepy/tweepy) which, if you need to interface with Twitter via Python, I HIGHLY recommend you make use of.
+This program is made possible by the awesome [Tweepy library](https://github.com/tweepy/tweepy)
+which, if you need to interface with
+Twitter via Python, I HIGHLY recommend you make use of.
 
 Installation:
 -------------
 1. If you don't have it already, [Install Setuptools](http://pypi.python.org/pypi/setuptools/#installation-instructions)
+   
 
 2. Run the following command:
     $ [sudo] easy_install yati
@@ -24,7 +34,8 @@ How To Use:
     $ yati [-u, --update your_status_update]
 #### To retweet a status: 
     $ yati [-r, --retweet tweet_id]
-  *Note: The tweet_id will appear as the #N right before the tweet when you make a call to Yati. 
+  *Note: The tweet_id will appear as the #N right before the tweet when you
+  make a call to Yati. 
   e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2*
 #### TL;DR:
     $ usage: yati [-h] [-g, --get_tweets [NUM_TWEETS_TO_GET]]
