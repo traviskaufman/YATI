@@ -1,6 +1,7 @@
 YATI (Yet Another Twitter Interface) - A Twitter CLI
 =====================================================
-Starting as a bored-one-night hack home feed scraper, YATI is now (turning into?) a full-blown twitter CLI, with the ability to retrieve any number of tweets from your home timeline, post status updates, and retweet statuses.
+Starting as a bored-one-night hack home feed scraper, YATI is now (turning into?) a full-blown twitter CLI, with the ability to retrieve any number of tweets from your home timeline, post status updates, and retweet statuses. You can do cool things with YATI, like hooking it up to a crontab and embedding a subshell on your desktop to get the latest tweets right there, or integrate it into your Jenkins servers for up-to-the-minute broadcasts on your build statuses.
+
 More features, such as being able to retrieve tweets from specific friends, get mentions, etc. will be added in the future!
 
 
@@ -8,28 +9,10 @@ This program is made possible by the awesome [Tweepy library](https://github.com
 
 Installation:
 -------------
-*NOTE: you will soon be able to install this with easy_install*
+1. If you don't have it already, [Install Setuptools](http://pypi.python.org/pypi/setuptools/#installation-instructions)
 
-1. If you don't have it already, install tweepy:
-
-        $ [sudo] easy_install tweepy
-
-
-2. Clone the repo    
-
-        $ git clone https://github.com/traviskaufman/YATI.git
-
-
-3. Run the setup script
-
-        $ cd path/to/yati/
-        $ python setup.py install
-        
-   Alternatively, if you like ruby and have rake installed (which if you're not, get on it):
-   
-        $ rake build          # Build, but don't install, the application
-        $ rake buildinstall   # Build and install the application
-        $ rake lint           # Lint the code (requires pyLint) 
+2. Run the following command:
+    $ [sudo] easy_install yati
 
 How To Use:
 ------------
