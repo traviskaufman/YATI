@@ -19,14 +19,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see http://www.gnu.org/licenses.
 """
 __author__ = "Travis Kaufman"
+__version__ = "1.0.0dev"
 
 import tweepy
 import time
 import os
+import subprocess
 import sys
 import pickle
 import HTMLParser
 import argparse
+import platform
 
 
 class Yati:
@@ -56,6 +59,7 @@ class Yati:
             self._config['AT_KEY'] = authkeys[0][:-1]
             self._config['AT_SEC'] = authkeys[1][:-1]
         except IOError:
+            open_cmd = 'open' if self._is_mac() else 'xgd-open'
             auth_url = auth.get_authorization_url()
             sys.stderr.write(
                 "***NOTICE: Authorization required.***\nA URL will soon open "\
@@ -64,7 +68,7 @@ class Yati:
                 " doesn't open, please paste the following into your web "\
                 " browser: %s\n" % auth_url)
             time.sleep(3)
-            os.system('open ' + auth_url)
+            subprocess.call([open_cmd, auth_url])
             verifier = raw_input('PIN: ').strip()
             auth.get_access_token(verifier)
             self._config['AT_KEY'] = auth.access_token.key
@@ -192,7 +196,9 @@ class Yati:
         except KeyError:
             return -1
 
-    # Serialize tweetTable and write it to file
+    def _is_mac(self):
+        return bool(platform.mac_ver()[0])
+
     def __del__(self):
         if self._should_flush_prev_tweets:
             try:
