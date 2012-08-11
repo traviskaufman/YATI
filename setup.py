@@ -15,7 +15,7 @@ mentions, etc. will be added in the future!
 """
 
 setup(name='yati',
-      version='1.0.0dev',
+      version='1.0.0',
       description='Yet Another Twitter Interface: A Twitter CLI',
       author='Travis Kaufman',
       author_email='travis.kaufman@gmail.com',
