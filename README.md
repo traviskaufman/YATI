@@ -21,8 +21,7 @@ Installation:
 1. If you don't have it already, [Install Setuptools](http://pypi.python.org/pypi/setuptools/#installation-instructions)
    
 
-2. Run the following command:
-    $ [sudo] easy_install yati
+2. Run the following command: <code>$ [sudo] easy_install yati</code>
 
 How To Use:
 ------------
