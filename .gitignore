@@ -3,3 +3,5 @@ twitterDoc.html
 *.swp
 *.pyc
 build/
+dist/
+*.egg-info
