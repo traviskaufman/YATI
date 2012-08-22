@@ -2,6 +2,7 @@ twitterDoc.html
 .DS_Store
 *.swp
 *.pyc
-build/
+build/*
+!build/*.py
 dist/
 *.egg-info
