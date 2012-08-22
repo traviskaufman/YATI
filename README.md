@@ -23,6 +23,12 @@ Installation:
 
 2. Run the following command: <code>$ [sudo] easy_install yati</code>
 
+Get the Latest Development Version:
+-----------------------------------
+1. Checkout this repo
+
+2. Run <code>$ python setup.py install</code>
+
 How To Use:
 ------------
 #### To get the 10 newest tweets on your home timeline: 
