@@ -43,6 +43,11 @@ class Yati:
             'AT_SEC': '',
             'USERDIR': os.getenv("HOME")
         }
+        self._config['CONFIG_DIR'] = "%s/.yati" % self._config['USERDIR']
+        self._config['AUTH_FILE'] = "%s/auth" % self._config['CONFIG_DIR']
+        self._config['TWEET_CACHE'] = "%s/tweetcache" % \
+                                       self._config['CONFIG_DIR']
+
         self._tweepy = None
         self._should_flush_prev_tweets = True
         self._got_tweets_before = False
@@ -50,61 +55,9 @@ class Yati:
         self._tweet_table_length = 0
         self._can_retweet = True
 
-        #authorize the user
-        auth = tweepy.OAuthHandler(self._config['CONSUMER_KEY'],
-                                   self._config['CONSUMER_SECRET'])
-        try:
-            authfile = open(self._config['USERDIR'] + '/.yti', 'r')
-            authkeys = authfile.readlines()
-            self._config['AT_KEY'] = authkeys[0][:-1]
-            self._config['AT_SEC'] = authkeys[1][:-1]
-        except IOError:
-            open_cmd = 'open' if self._is_mac() else 'xdg-open'
-            auth_url = auth.get_authorization_url()
-            sys.stderr.write(
-                "***NOTICE: Authorization required.***\nA URL will soon open "\
-                "that will guide you through app authorization. Once you have"\
-                " authorized the app, enter the PIN you receive below.\nIf it"\
-                " doesn't open, please paste the following into your web "\
-                " browser: %s\n" % auth_url)
-            time.sleep(3)
-            dev_null = open(os.devnull)
-            subprocess.call("%s %s" % (open_cmd, auth_url),
-                             shell=True,
-                             stdout=dev_null,
-                             stderr=dev_null)
-            dev_null.close()
-            verifier = raw_input('PIN: ').strip()
-            auth.get_access_token(verifier)
-            self._config['AT_KEY'] = auth.access_token.key
-            self._config['AT_SEC'] = auth.access_token.secret
-            authkeys = ["%s\n" % self._config['AT_KEY'],
-                        "%s\n" % self._config['AT_SEC'],
-                        'end']
-            try:
-                authfile = open(self._config['USERDIR'] + '/.yti', 'w')
-                authfile.writelines(authkeys)
-                authfile.close()
-                sys.stderr.write("Successfully authorized!\n")
-            except IOError:
-                sys.stderr.write("Error writing credentials to file. "\
-                    "You may have to re-authorize when you use this app. "\
-                    "To prevent this from happening, check disk space and/or "\
-                    "file permissions and try again.")
-        auth.set_access_token(self._config['AT_KEY'], self._config['AT_SEC'])
-
-        # get the Tweepy API
+        auth = self._get_authorization()
         self._tweepy = tweepy.API(auth)
-        try:
-            self._tweet_table = pickle.load(open(
-                            '%s/.__yt__tweets' % self._config['USERDIR'],
-                            'r'))
-            if not self._tweet_table:
-                self._can_retweet = False
-            else:
-                self._tweet_table_length = len(self._tweet_table)
-        except IOError:
-            self._can_retweet = False
+        self._get_cached_tweets()
 
     def get_tweets(self, max_tweets=10):
         """Retrieve tweets from the authorized user's home timeline, starting
@@ -201,14 +154,79 @@ class Yati:
         except KeyError:
             return -1
 
+    def _get_authorization(self):
+        auth = tweepy.OAuthHandler(self._config['CONSUMER_KEY'],
+                                   self._config['CONSUMER_SECRET'])
+        try:
+            authfile = open(self._config['AUTH_FILE'], 'r')
+            authkeys = authfile.readlines()
+            self._config['AT_KEY'] = authkeys[0][:-1]
+            self._config['AT_SEC'] = authkeys[1][:-1]
+        except IOError:
+            self._open_auth_url(auth.get_authorization_url())
+            verifier = raw_input('PIN: ').strip()
+            auth.get_access_token(verifier)
+            self._config['AT_KEY'] = auth.access_token.key
+            self._config['AT_SEC'] = auth.access_token.secret
+            authkeys = ["%s\n" % self._config['AT_KEY'],
+                        "%s\n" % self._config['AT_SEC'],
+                        'end']
+            self._store_auth(authkeys)
+        finally:
+            auth.set_access_token(self._config['AT_KEY'],
+                                  self._config['AT_SEC'])
+
+        return auth
+
+    def _get_cached_tweets(self):
+        try:
+            self._tweet_table = pickle.load(open(self._config['TWEET_CACHE'],
+                                                 'r'))
+
+            if not self._tweet_table:
+                self._can_retweet = False
+            else:
+                self._tweet_table_length = len(self._tweet_table)
+        except IOError:
+            self._can_retweet = False
+
     def _is_mac(self):
         return bool(platform.mac_ver()[0])
+
+    def _open_auth_url(self, auth_url):
+        self._open_auth_url()
+        open_cmd = 'open' if self._is_mac() else 'xdg-open'
+        sys.stderr.write(
+            "***NOTICE: Authorization required.***\nA URL will soon open "\
+            "that will guide you through app authorization. Once you have"\
+            " authorized the app, enter the PIN you receive below.\nIf it"\
+            " doesn't open, please paste the following into your web "\
+            " browser: %s\n" % auth_url)
+        time.sleep(3)
+        dev_null = open(os.devnull)
+        subprocess.call("%s %s" % (open_cmd, auth_url),
+                         shell=True,
+                         stdout=dev_null,
+                         stderr=dev_null)
+        dev_null.close()
+
+    def _store_auth(self, authkeys):
+        try:
+            authfile = open(self._config['AUTH_FILE'], 'w')
+            authfile.writelines(authkeys)
+            authfile.close()
+            sys.stderr.write("Successfully authorized!\n")
+        except IOError:
+            sys.stderr.write("Error writing credentials to file. "\
+                "You may have to re-authorize when you use this app. "\
+                "To prevent this from happening, check disk space and/or "\
+                "file permissions and try again.")
 
     def __del__(self):
         if self._should_flush_prev_tweets:
             try:
-                tweet_file = open(self._config['USERDIR'] + '/.__yt__tweets',
-                                  'w')
+                tweet_file = open(self._config['TWEET_CACHE'], 'w')
+
                 pickle.dump(self._tweet_table, tweet_file)
             except IOError:
                 print 'File write failed'
