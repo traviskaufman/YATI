@@ -41,5 +41,7 @@ setup(name='yati',
           ]
       },
       py_modules=['yati'],
-      long_description=long_desc
+      long_description=long_desc,
+      tests_require=['nose>=1.1', 'mockito>=0.5'],
+      test_suite='nose.collector'
 )
