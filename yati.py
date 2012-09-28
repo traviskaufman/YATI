@@ -34,27 +34,25 @@ import platform
 
 class Yati:
     """Wrapper for the Twitter Command Line Interface"""
+    _config = {
+        'CONSUMER_KEY': '3PqhYFkJohEruGu1Oxh85g',
+        'CONSUMER_SECRET': 'TNmjRcWKMMecAbTJm7WuB8H63xp5GJjvS9y1dWhC0',
+        'AT_KEY': '',
+        'AT_SEC': '',
+        'USERDIR': os.getenv("HOME")
+    }
+    _tweepy = None
+    _should_flush_prev_tweets = True
+    _got_tweets_before = False
+    _tweet_table = {}
+    _tweet_table_length = 0
+    _can_retweet = True
 
     def __init__(self):
-        self._config = {
-            'CONSUMER_KEY': '3PqhYFkJohEruGu1Oxh85g',
-            'CONSUMER_SECRET': 'TNmjRcWKMMecAbTJm7WuB8H63xp5GJjvS9y1dWhC0',
-            'AT_KEY': '',
-            'AT_SEC': '',
-            'USERDIR': os.getenv("HOME")
-        }
         self._config['CONFIG_DIR'] = "%s/.yati" % self._config['USERDIR']
         self._config['AUTH_FILE'] = "%s/auth" % self._config['CONFIG_DIR']
         self._config['TWEET_CACHE'] = "%s/tweetcache" % \
                                        self._config['CONFIG_DIR']
-
-        self._tweepy = None
-        self._should_flush_prev_tweets = True
-        self._got_tweets_before = False
-        self._tweet_table = {}
-        self._tweet_table_length = 0
-        self._can_retweet = True
-
         auth = self._get_authorization()
         self._tweepy = tweepy.API(auth)
         self._get_cached_tweets()
@@ -91,7 +89,10 @@ class Yati:
             print "#%s: %s (%s)" % (str(i),
                                     tweet.user.screen_name,
                                     tweet.user.name)
-            print html_parser.unescape(tweet.text.encode('utf8'))
+            try:
+                print html_parser.unescape(tweet.text.encode('utf8'))
+            except UnicodeDecodeError:
+                print html_parser.unescape(tweet.text)
             print '----------------------------'
 
     def update_status(self, new_status):
