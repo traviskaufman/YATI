@@ -1,8 +1,20 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    from ez_setup import use_setuptools
+    use_setuptools()
+    from setuptools import setup, find_packages
+
 from setuptools.command.install import install as _install
+from sys import hexversion, exit, stderr
 from yati import __version__ as VERSION
 import build.update as update
+
+
+if hexversion < 0x02070000:
+    stderr.write("Error: yati is only compatible with Python2.7+")
+    exit(1)
 
 long_desc = """
 Starting as a bored-one-night hack home feed scraper, YATI is now (turning
