@@ -1,0 +1,14 @@
+v1.1:
+- UNIT TESTS
+- Mentions
+- Favoriting
+
+v1.2:
+- Other interactions (replies, favorites)
+- Tweets from specific friends
+
+v2.0:
+- REPL:
+    Better way to map CL args to functions
+    Allow batch request based on order of CL args
+- Streaming

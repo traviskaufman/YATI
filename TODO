@@ -1,5 +1,0 @@
-Refactor __init__
-  ** Have authorization method be successful only if auth.set_access_token is successful
-Better way to map CL args to functions
-Allow batch request based on order of CL args
-UNIT TESTS
