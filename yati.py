@@ -164,7 +164,7 @@ class Yati:
         auth = tweepy.OAuthHandler(self._config['CONSUMER_KEY'],
                                    self._config['CONSUMER_SECRET'])
 
-        if not self._config['AT_KEY'] and self._config['AT_SEC']:
+        if not self._config['AT_KEY'] or not self._config['AT_SEC']:
 
             if os.path.exists(self._config['AUTH_FILE']):
                 authfile = open(self._config['AUTH_FILE'], 'r')
