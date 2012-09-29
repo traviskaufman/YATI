@@ -48,12 +48,17 @@ class Yati:
     _tweet_table_length = 0
     _can_retweet = True
 
-    def __init__(self):
+    def __init__(self, auth_key=None, auth_secret=None):
         self._config['CONFIG_DIR'] = "%s/.yati" % self._config['USERDIR']
         self._config['AUTH_FILE'] = "%s/auth" % self._config['CONFIG_DIR']
         self._config['TWEET_CACHE'] = "%s/tweetcache" % \
                                        self._config['CONFIG_DIR']
+
+        if auth_key and auth_secret:
+            self._config['AT_KEY'] = auth_key
+            self._config['AT_SEC'] = auth_secret
         auth = self._get_authorization()
+
         self._tweepy = tweepy.API(auth)
         self._get_cached_tweets()
 
@@ -158,24 +163,28 @@ class Yati:
     def _get_authorization(self):
         auth = tweepy.OAuthHandler(self._config['CONSUMER_KEY'],
                                    self._config['CONSUMER_SECRET'])
-        try:
-            authfile = open(self._config['AUTH_FILE'], 'r')
-            authkeys = authfile.readlines()
-            self._config['AT_KEY'] = authkeys[0][:-1]
-            self._config['AT_SEC'] = authkeys[1][:-1]
-        except IOError:
-            self._open_auth_url(auth.get_authorization_url())
-            verifier = raw_input('PIN: ').strip()
-            auth.get_access_token(verifier)
-            self._config['AT_KEY'] = auth.access_token.key
-            self._config['AT_SEC'] = auth.access_token.secret
-            authkeys = ["%s\n" % self._config['AT_KEY'],
-                        "%s\n" % self._config['AT_SEC'],
-                        'end']
-            self._store_auth(authkeys)
-        finally:
-            auth.set_access_token(self._config['AT_KEY'],
-                                  self._config['AT_SEC'])
+
+        if not self._config['AT_KEY'] and self._config['AT_SEC']:
+
+            if os.path.exists(self._config['AUTH_FILE']):
+                authfile = open(self._config['AUTH_FILE'], 'r')
+                authkeys = authfile.readlines()
+                self._config['AT_KEY'] = authkeys[0][:-1]
+                self._config['AT_SEC'] = authkeys[1][:-1]
+
+            else:
+                self._open_auth_url(auth.get_authorization_url())
+                verifier = raw_input('PIN: ').strip()
+                auth.get_access_token(verifier)
+                self._config['AT_KEY'] = auth.access_token.key
+                self._config['AT_SEC'] = auth.access_token.secret
+                authkeys = ["%s\n" % self._config['AT_KEY'],
+                            "%s\n" % self._config['AT_SEC'],
+                            'end']
+                self._store_auth(authkeys)
+
+        auth.set_access_token(self._config['AT_KEY'],
+                              self._config['AT_SEC'])
 
         return auth
 
