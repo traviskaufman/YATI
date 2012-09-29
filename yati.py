@@ -233,10 +233,11 @@ class Yati:
                 print 'File write failed'
 
 
-def main():
-    """Where the magic happens"""
+def get_argparser():
+    """Bootstrap the argument parser for YATI"""
     parser = argparse.ArgumentParser(
             description="A Python-based Twitter CLI")
+
     parser.add_argument("-g", "--get_tweets",
                         dest="num_tweets_to_get",
                         type=int,
@@ -244,16 +245,32 @@ def main():
                         nargs='?',
                         help="Retrieve a certain number of tweets from your" \
                         " home timeline (defaults to 10)")
+
     parser.add_argument("-u", "--update",
                         type=str,
                         dest='status_update',
                         help="Update your status")
+
     parser.add_argument("-r", "--retweet",
                         type=int,
                         dest='rt_tweet_id',
                         help="Retweet a status with ID #N, where N is the" \
                         " number that prefixes the status you'd like to" \
                         " retweet")
+
+    parser.add_argument("-i", "--in-reply-to",
+                        type=int,
+                        dest='reply_to_tweet_id',
+                        help="Use this with -u to reply to a specific tweet. "\
+                             "It will automatically add the \"@{username}\" "\
+                             "to the tweet for you. reply_to_tweet_id "\
+                             "is the same as with retweeting")
+    return parser
+
+
+def main():
+    """Where the magic happens"""
+    parser = get_argparser()
     args = parser.parse_args()
 
     yati = Yati()
@@ -262,7 +279,7 @@ def main():
     # REPL
     if len(sys.argv) < 2:
         parser.print_usage()
-        sys.exit()
+        sys.exit(1)
 
     if args.status_update:
         status = yati.update_status(args.status_update)
@@ -276,20 +293,20 @@ def main():
             result = yati.retweet(args.rt_tweet_id)
         except tweepy.error.TweepError as tw_err:
             print tw_err
-            sys.exit()
+            sys.exit(1)
         if type(result) is int and result is 0:
             print 'Error: unknown failure. Check internet connection possibly'
             parser.print_usage()
-            sys.exit()
+            sys.exit(1)
         elif type(result) is int and result is -1:
             print '%s is not a valid key. Please enter a valid key and '\
                     'try again' % str(args.rt_tweet_id)
             parser.print_usage()
-            sys.exit()
+            sys.exit(1)
         elif not result:
             print 'Retweet failed. Perhaps you have not stored any tweets? '\
                 'Try running just yati.py or yati.py [numTweets] and try again'
-            sys.exit()
+            sys.exit(1)
         else:  # was successful
             print 'Retweet of tweet #%s (%s...) by @%s successful!' % \
                   (str(args.rt_tweet_id),
