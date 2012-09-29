@@ -42,9 +42,24 @@ How To Use:
   *Note: The tweet_id will appear as the #N right before the tweet when you
   make a call to Yati. 
   e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2*
+#### To reply to a tweet:
+    $ yati [-i, --in-reply-to tweet_id] -u reply
+Note that yati will automatically add in a reference to the user you are
+replying to, so you don't have to worry about doing so. E.g. if you write
+
+    $ yati -i 2 -u "I agree completely."
+
+And the user who posted the tweet with id #2 has a screen name of awesomeguy32,
+your tweet will show up on twitter as "@awesomeguy32 I agree completely."
+
+If you supply an -i switch, the program will expect you to supply a -u switch
+as well (after all, what good is a reply if you have nothing to reply with?).
+If you don't supply a -u switch, the program will simply do nothing. The
+`tweet_id` supplied is the same `tweet_id` used for retweeting.
 #### TL;DR:
     $ usage: yati [-h] [-g, --get_tweets [NUM_TWEETS_TO_GET]]
                 [-u, --update STATUS_UPDATE] [-r, --retweet RT_TWEET_ID] 
+                [-i, --in-reply-to TWEET_ID]
 
 Copyright (C) 2012 Travis Kaufman
 ----------------------------------
