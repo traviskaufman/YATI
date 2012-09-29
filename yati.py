@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see http://www.gnu.org/licenses.
 """
 __author__ = "Travis Kaufman"
-__version__ = "1.0.1dev"
+__version__ = "1.1.0dev"
 
 import tweepy
 import time
@@ -100,22 +100,43 @@ class Yati:
                 print html_parser.unescape(tweet.text)
             print '----------------------------'
 
-    def update_status(self, new_status):
+    def update_status(self, new_status, reply_to_id=None):
         """
         Updates your Twitter Status from the command line
         ---------------------------------------
         new_status: Your status that you want to post.
 
-        Returns: True if status update successful, False if not
+        reply_to_id: (Optional) If given a valid tweet ID, this will reply to
+        that given tweet.
+
+        Returns: Status object if status update successful, None if not
         """
         # We aren't getting any new tweets so no reason to flush the tweetTable
         self._should_flush_prev_tweets = False
+        status_to_reply_to = None
+        if reply_to_id:
+            try:
+                status_to_reply_to = self._tweet_table[reply_to_id - 1]
+            except KeyError:
+                sys.stderr.write("Error: status #%s not found\n"\
+                                 % reply_to_id)
+                return None
+            reply_to_status_id = status_to_reply_to.id
+            user_to_reply_to = status_to_reply_to.user.screen_name
+            # Prepend orig. status poster's username to status
+            new_status = "@%s %s" % (user_to_reply_to, new_status)
+
         max_chars = 140
         if len(new_status) > max_chars:
             sys.stderr.write(
-                    "Error: tweets cannot be more than 140 characters")
-            return False
-        return self._tweepy.update_status(unicode(new_status))
+                    "Error: status update exceeds the %s character limit "\
+                    "by %s characters" % (max_chars,
+                                          len(new_status) - max_chars))
+            return None
+
+        return self._tweepy.update_status(
+                                      unicode(new_status),
+                                      in_reply_to_status_id=reply_to_status_id)
 
     def store_tweets(self, tweets):
         """
@@ -270,6 +291,7 @@ def get_argparser():
     parser.add_argument("-i", "--in-reply-to",
                         type=int,
                         dest='reply_to_tweet_id',
+                        default=None,
                         help="Use this with -u to reply to a specific tweet. "\
                              "It will automatically add the \"@{username}\" "\
                              "to the tweet for you. reply_to_tweet_id "\
@@ -291,7 +313,8 @@ def main():
         sys.exit(1)
 
     if args.status_update:
-        status = yati.update_status(args.status_update)
+        status = yati.update_status(args.status_update,
+                                    reply_to_id=args.reply_to_tweet_id)
         if status:
             print 'Status update successful'
         else:

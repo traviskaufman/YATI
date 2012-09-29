@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 from setuptools.command.install import install as _install
+from yati import __version__ as VERSION
 import build.update as update
 
 long_desc = """
@@ -12,8 +13,19 @@ subshell on your desktop to get the latest tweets right there, or integrate it
 into your Jenkins servers for up-to-the-minute broadcasts on your build
 statuses.
 
-More features, such as being able to retrieve tweets from specific friends, get
-mentions, etc. will be added in the future!
+Currently, you can:
+    * Get statuses from your home timeline
+    * Update your status
+    * Reply to tweets
+    * Retweet tweets
+
+In the future, you will be able to:
+    * Get mentions
+    * Favorite tweets
+    * Update your location
+    * Use this as a REPL
+    * Stream tweets
+    * and more!
 """
 
 
@@ -25,7 +37,7 @@ class install(_install):
 
 setup(name='yati',
       cmdclass={'install': install},
-      version='1.0.1dev',
+      version=VERSION,
       description='Yet Another Twitter Interface: A Twitter CLI',
       author='Travis Kaufman',
       author_email='travis.kaufman@gmail.com',
