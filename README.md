@@ -41,7 +41,7 @@ How To Use:
     $ yati [-r, --retweet tweet_id]
   *Note: The tweet_id will appear as the #N right before the tweet when you
   make a call to Yati. 
-  e.g. $ yati.py # #1, #2, etc.. && yati.py --rt 2*
+  e.g. $ yati -g #1, #2, etc.. && yati -r 2*
 #### To reply to a tweet:
     $ yati [-i, --in-reply-to tweet_id] -u reply
 Note that yati will automatically add in a reference to the user you are

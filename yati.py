@@ -114,6 +114,7 @@ class Yati:
         # We aren't getting any new tweets so no reason to flush the tweetTable
         self._should_flush_prev_tweets = False
         status_to_reply_to = None
+        reply_to_status_id = None
         if reply_to_id:
             try:
                 status_to_reply_to = self._tweet_table[reply_to_id - 1]
