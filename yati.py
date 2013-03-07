@@ -27,7 +27,6 @@ import os
 import subprocess
 import sys
 import pickle
-import HTMLParser
 import argparse
 import platform
 
@@ -83,7 +82,6 @@ class Yati:
 
         tweets: A list of tweepy status objects
         """
-        html_parser = HTMLParser.HTMLParser()
         i = 0
         title = "************* RECENT TWEETS ***************"
         print title.encode('utf8')
@@ -94,10 +92,7 @@ class Yati:
             print "#%s: %s (%s)" % (str(i),
                                     tweet.user.screen_name,
                                     tweet.user.name)
-            try:
-                print html_parser.unescape(tweet.text.encode('utf8'))
-            except UnicodeDecodeError:
-                print html_parser.unescape(tweet.text)
+            print tweet.text
             print '----------------------------'
 
     def update_status(self, new_status, reply_to_id=None):
