@@ -58,7 +58,7 @@ setup(name='yati',
                    '/yati/yati-1.0.1dev.tar.gz',
       license='GPL',
       packages=find_packages(),
-      install_requires=['tweepy==1.10'],
+      install_requires=['tweepy==3.0'],
       entry_points={
           'console_scripts': [
               'yati = yati:main'
